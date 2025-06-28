@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Editar Familia</title>
+    <meta charset="UTF-8">
+	<link rel="stylesheet" th:href="@{/css/estilo.css}" />
+</head>
+
+<body>
+    <h2>Editar Familia</h2>
+
+    <form th:action="@{'/familias/' + ${familia.idFamilia}}" th:object="${familiaForm}" method="post">
+        <label>Nro Familia:</label>
+        <input type="text" th:field="*{idFamilia}" readonly /><br><br>
+
+        <label>Nombre:</label>
+        <input type="text" th:field="*{nombre}" /><br><br>
+
+        <label>Fecha de alta:</label>
+        <input type="date" th:field="*{fechaRegistro}" readonly /><br><br>
+
+        <label>Integrantes:</label>
+        <table>
+            <thead>
+                <tr>
+                    <th>DNI</th>
+                    <th>Apellido</th>
+                    <th>Nombre</th>
+                    <th>Fecha de nacimiento</th>
+                    <th>Ocupacion</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="asistido : ${familia.asistidos}">
+                    <td th:text="${asistido.dni}"></td>
+                    <td th:text="${asistido.apellido}"></td>
+                    <td th:text="${asistido.nombre}"></td>
+                    <td th:text="${asistido.fechaNacimiento}"></td>
+                    <td th:text="${asistido.ocupacion}"></td>
+                    <td>
+                        <a class="btn-editar" th:href="@{'/asistidos/editar/' + ${asistido.id}}">Editar</a>
+                        <a class="btn-eliminar" th:href="@{'/asistidos/eliminar/' + ${asistido.id}}">Eliminar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class= "btn" type="submit" name="action" value="guardar">Guardar cambios</button>
+        <button class= "btn" type="submit" name="action" value="cancelar">Cancelar</button>
+    </form>
+	
+
+	
+</body>
+
+</html>

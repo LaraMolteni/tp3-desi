@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Menú Principal</title>
+    <link rel="stylesheet" th:href="@{/css/estilo.css}" />
+</head>
+<body>
+   <div class="starter-template">
+        <h1>Centro de distribución 'El Jacaranda' </h1>
+        <h2>
+            <span th:text="'Menú principal'"></span>
+        </h2>
+    </div>
+    
+
+    <div class="menu">
+        <a th:href="@{/familias}">Familias</a>
+        <a th:href="@{/recetas}">Recetas</a>
+        <a th:href="@{/preparaciones}">Preparaciones</a>
+		<a th:href="@{/entregaAlimentos}">Entrega de alimentos</a>
+    </div>
+
+</body>
+</html>

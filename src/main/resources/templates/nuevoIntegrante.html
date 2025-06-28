@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Agregar Integrante</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" th:href="@{/css/estilo.css}" />
+</head>
+
+<body>
+	<h2>Nuevo integrante</h2>
+
+	<form th:action="@{/familias/guardarIntegrante}" th:object="${asistidoForm}" method="post">
+ 
+		<label>DNI:</label>
+		<input type="text" th:field="*{dni}" required /><br>
+		<div th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></div>
+
+		<label>Nombre:</label>
+		<input type="text" th:field="*{nombre}" required /><br>
+		<div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+
+		<label>Apellido:</label>
+		<input type="text" th:field="*{apellido}" required /><br>
+		<div th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></div>
+
+		<label>Fecha de nacimiento:</label>
+		<input type="date" th:field="*{fechaNacimiento}" required /><br>
+		<div th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}"></div>
+
+		<label>Ocupación:</label>
+		<select th:field="*{ocupacion}">
+			<option value="desempleado">Desempleado</option>
+			<option value="empleado">Empleado</option>
+			<option value="estudiante">Estudiante</option>
+			<option value="ama de casa">Ama de casa</option>
+			<option value="otro">Otro</option>
+		</select><br><br>
+		
+		
+		
+		<button type="submit" name="action" value="guardar">Guardar integrante</button>
+		<a th:href="@{/familias/agregarFamilia}" class="btn">Cancelar</a>
+	</form>
+</body>
+
+</html>
