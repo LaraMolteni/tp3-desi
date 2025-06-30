@@ -75,6 +75,14 @@ public class Receta {
 	public void setActiva(boolean activa) {
 		this.activa = activa;
 	}
+
+	public int getCaloriasTotales() {
+		if (itemsReceta == null) return 0;
+		return itemsReceta.stream()
+			.filter(i -> i != null && i.getCalorias() != null)
+			.mapToInt(ItemReceta::getCalorias)
+			.sum();
+	}
 	
 	
 	

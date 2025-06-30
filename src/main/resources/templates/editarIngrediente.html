@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Ingrediente</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}" />
+</head>
+<body>
+    <h2>Editar Ingrediente</h2>
+    <form th:action="@{'/ingredientes/editar/' + ${ingrediente.id}}" th:object="${ingrediente}" method="post">
+        <label>Nombre:</label>
+        <input type="text" th:field="*{nombre}" required/><br/>
+        <button type="submit">Guardar</button>
+        <a th:href="@{/ingredientes}">Cancelar</a>
+    </form>
+    <div th:if="${error}" class="alerta alerta-danger">
+        <p th:text="${error}"></p>
+    </div>
+</body>
+</html>

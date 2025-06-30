@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+## Archivos cache
+.DS_Store
+Thumbs.db
