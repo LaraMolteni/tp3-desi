@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Agregar Receta</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}" />
+    <!-- Un poquito de JavaScript para agregar filas a la tabla al querer agregar un nuevo ingrediente -->
+    <script>
+        function agregarIngrediente() {
+            const tabla = document.getElementById('tabla-ingredientes').getElementsByTagName('tbody')[0];
+            const rowCount = tabla.rows.length;
+            const row = tabla.insertRow(rowCount);
+            row.innerHTML = document.getElementById('fila-ingrediente').innerHTML.replace(/__IDX__/g, rowCount);
+        }
+        function eliminarIngrediente(btn) {
+            const row = btn.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+    </script>
+</head>
+<body>
+    <h2>Agregar Receta</h2>
+    <form th:action="@{/recetas/nueva}" th:object="${receta}" method="post">
+        <label>Nombre:</label>
+        <input type="text" th:field="*{nombre}" required/><br/>
+        <div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+        <label>Descripción:</label>
+        <textarea th:field="*{descripcion}" required></textarea><br/>
+        <div th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></div>
+        <h3>Ingredientes</h3>
+        <table id="tabla-ingredientes" border="1">
+            <thead>
+                <tr>
+                    <th>Ingrediente</th>
+                    <th>Cantidad (kg)</th>
+                    <th>Calorías</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button type="button" onclick="agregarIngrediente()">Agregar ingrediente</button>
+        <br/><br/>
+        <button type="submit">Guardar</button>
+        <a th:href="@{/recetas}">Cancelar</a>
+    </form>
+    <div th:if="${error}" class="alerta alerta-danger">
+        <p th:text="${error}"></p>
+    </div>
+    <!-- Fila oculta para clonar -->
+    <table style="display:none;">
+        <tbody>
+            <tr id="fila-ingrediente">
+                <td>
+                    <select name="itemsReceta[__IDX__].ingrediente.id" required>
+                        <option th:each="ing : ${ingredientes}" th:value="${ing.id}" th:text="${ing.nombre}"></option>
+                    </select>
+                </td>
+                <td><input type="number" name="itemsReceta[__IDX__].cantidad" min="0.01" step="0.01" required/></td>
+                <td><input type="number" name="itemsReceta[__IDX__].calorias" min="1" required/></td>
+                <td><button type="button" onclick="eliminarIngrediente(this)">Eliminar</button></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

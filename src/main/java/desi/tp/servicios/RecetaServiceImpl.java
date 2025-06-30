@@ -33,10 +33,19 @@ public class RecetaServiceImpl implements RecetaService {
 		Optional<Receta> opt = recetaRepo.findById(id);
         if (opt.isPresent()) {
             Receta receta = opt.get();
-            // No modificar nombre
             receta.setDescripcion(datos.getDescripcion());
-            //receta.setTamanoRacion(datos.getTamanoRacion());
-            receta.setItemsReceta(datos.getItemsReceta());
+            // Actualizar itemsReceta correctamente para evitar error de orphanRemoval
+			// Porque sino se estaba generando un tema de desfazaje entre lo que cacheaba hibernate y los nuevos items
+            if (receta.getItemsReceta() != null) {
+                receta.getItemsReceta().clear();
+                if (datos.getItemsReceta() != null) {
+                    datos.getItemsReceta().forEach(item -> item.setReceta(receta));
+                    receta.getItemsReceta().addAll(datos.getItemsReceta());
+                }
+            } else if (datos.getItemsReceta() != null) {
+                datos.getItemsReceta().forEach(item -> item.setReceta(receta));
+                receta.setItemsReceta(datos.getItemsReceta());
+            }
             return recetaRepo.save(receta);
         }
         return null;

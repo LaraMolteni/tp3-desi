@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Receta</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}" />
+</head>
+<body>
+    <h2>Editar Receta</h2>
+    <form th:action="@{'/recetas/editar/' + ${receta.id}}" th:object="${receta}" method="post">
+        <label>Nombre:</label>
+        <input type="text" th:field="*{nombre}" readonly/><br/>
+        <label>Descripción:</label>
+        <input type="text" th:field="*{descripcion}" required/><br/>
+        <div th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></div>
+        <h3>Ingredientes de la receta</h3>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Ingrediente</th>
+                    <th>Cantidad (g)</th>
+                    <th>Calorías</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item, iterStat : *{itemsReceta}">
+                    <td>
+                        <span th:text="${item.ingrediente.nombre}"></span>
+                        <input type="hidden" th:field="*{itemsReceta[__${iterStat.index}__].ingrediente.id}" />
+                    </td>
+                    <td><input type="number" th:field="*{itemsReceta[__${iterStat.index}__].cantidad}" min="0.01" step="0.01" required/></td>
+                    <td><input type="number" th:field="*{itemsReceta[__${iterStat.index}__].calorias}" min="1" required/></td>
+                </tr>
+            </tbody>
+        </table>
+        <br/>
+        <button type="submit">Guardar</button>
+        <a th:href="@{/recetas}">Cancelar</a>
+    </form>
+</body>
+</html>

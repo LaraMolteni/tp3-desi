@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Recetas</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}" />
+</head>
+<body>
+    <h2>Listado de Recetas</h2>
+    <form method="get" th:action="@{/recetas}">
+        <input type="text" name="nombre" placeholder="Nombre" th:value="${param.nombre}" />
+        <button type="submit">Filtrar</button>
+    </form>
+    <a th:href="@{/recetas/nueva}" class="btn-agregar">Agregar Receta</a>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Calorías totales</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="receta : ${recetas}">
+                <td th:text="${receta.nombre}"></td>
+                <td th:text="${receta.descripcion}"></td>
+                <td th:text="${receta.caloriasTotales}"></td>
+                <td>
+                    <a th:href="@{'/recetas/editar/' + ${receta.id}}">Editar</a>
+                    <form th:action="@{'/recetas/eliminar/' + ${receta.id}}" method="post" style="display:inline;">
+                        <button type="submit" onclick="return confirm('¿Eliminar receta?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <a th:href="@{/}" class="btn-volver">Volver al menu principal</a>
+</body>
+</html>
