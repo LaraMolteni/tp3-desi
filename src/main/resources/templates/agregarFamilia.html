@@ -4,65 +4,64 @@
 <head>
 	<title>Agregar familia</title>
 	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
 	<link rel="stylesheet" th:href="@{/css/estilo.css}" />
 </head>
 
 <body>
-
-	<!-- Mensaje de éxito -->
-	<div th:if="${mensaje}" class="alerta alert-success">
-		<p th:text="${mensaje}"></p>
-	</div>
-
-	<!-- Mensaje de error -->
-	<div th:if="${error}" class="alerta alert-danger">
-		<p th:text="${error}"></p>
-	</div>
-
-	<h2>Agregar nueva familia</h2>
-
-	<form th:action="@{/familias/agregarFamilia}" th:object="${familiaForm}" method="post">
-
-		<label for="nombre">Nombre:</label>
-		<input type="text" th:field="*{nombre}" required /><br><br>
-		<div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
-
-		<label for="fechaRegistro">Fecha de alta:</label>
-		<input type="date" th:field="*{fechaRegistro}" readonly /><br><br>
-
-		<h3>Integrantes</h3>
-		<table border="1">
-			<thead>
-				<tr>
-					<th>DNI</th>
-					<th>Nombre</th>
-					<th>Apellido</th>
-					<th>Fecha Nacimiento</th>
-					<th>Ocupación</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:each="i :  *{asistidos}">
-					<td th:text=" ${i.dni}"></td>
-					<td th:text=" ${i.nombre}"></td>
-					<td th:text=" ${i.apellido}"></td>
-					<td th:text=" ${i.fechaNacimiento}"></td>
-					<td th:text=" ${i.ocupacion}"></td>
-				</tr>
-			</tbody>
-		</table>
-
-		<br>
-		<a class="btn-agregar" th:href="@{/familias/nuevoIntegrante}"> Agregar integrante</a><br><br>
-
-		<div th:if="${#fields.hasErrors('asistidos')}" th:errors="*{asistidos}"></div>
-
-
-		<button class="btn" type="submit" name="action" value="guardar">Guardar familia</button>
-		<a th:href="@{/familias}"><button class="btn" type="button">Cancelar</button></a>
-		<a th:href="@{/familias}" class="btn">Volver al listado</a>
-	</form>
-
+    <section class="section">
+        <div class="container">
+            <h2 class="title is-3">Agregar nueva familia</h2>
+            <form th:action="@{/familias/agregarFamilia}" th:object="${familiaForm}" method="post">
+                <div class="field">
+                    <label class="label">Nombre:</label>
+                    <div class="control">
+                        <input class="input" type="text" th:field="*{nombre}" required />
+                    </div>
+                    <div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="help is-danger"></div>
+                </div>
+                <div class="field">
+                    <label class="label">Fecha de alta:</label>
+                    <div class="control">
+                        <input class="input" type="date" th:field="*{fechaRegistro}" readonly />
+                    </div>
+                </div>
+                <h3 class="title is-5 mt-5">Integrantes</h3>
+                <table class="table is-striped is-hoverable is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>DNI</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Fecha Nacimiento</th>
+                            <th>Ocupación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="i :  *{asistidos}">
+                            <td th:text="${i.dni}"></td>
+                            <td th:text="${i.nombre}"></td>
+                            <td th:text="${i.apellido}"></td>
+                            <td th:text="${i.fechaNacimiento}"></td>
+                            <td th:text="${i.ocupacion}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <a class="button is-info mb-4" th:href="@{/familias/nuevoIntegrante}">Agregar integrante</a>
+                <div th:if="${#fields.hasErrors('asistidos')}" th:errors="*{asistidos}" class="help is-danger"></div>
+                <div class="buttons">
+                    <button type="submit" class="button is-primary">Guardar</button>
+                    <a th:href="@{/familias}" class="button is-light">Cancelar</a>
+                </div>
+            </form>
+            <div th:if="${mensaje}" class="notification is-success mt-4">
+                <p th:text="${mensaje}"></p>
+            </div>
+            <div th:if="${error}" class="notification is-danger mt-4">
+                <p th:text="${error}"></p>
+            </div>
+        </div>
+    </section>
 </body>
 
 </html>

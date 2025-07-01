@@ -3,38 +3,55 @@
 <head>
     <title>Recetas</title>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
     <link rel="stylesheet" th:href="@{/css/estilo.css}" />
 </head>
 <body>
-    <h2>Listado de Recetas</h2>
-    <form method="get" th:action="@{/recetas}">
-        <input type="text" name="nombre" placeholder="Nombre" th:value="${param.nombre}" />
-        <button type="submit">Filtrar</button>
-    </form>
-    <a th:href="@{/recetas/nueva}" class="btn-agregar">Agregar Receta</a>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Calorías totales</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="receta : ${recetas}">
-                <td th:text="${receta.nombre}"></td>
-                <td th:text="${receta.descripcion}"></td>
-                <td th:text="${receta.caloriasTotales}"></td>
-                <td>
-                    <a th:href="@{'/recetas/editar/' + ${receta.id}}">Editar</a>
-                    <form th:action="@{'/recetas/eliminar/' + ${receta.id}}" method="post" style="display:inline;">
-                        <button type="submit" onclick="return confirm('¿Eliminar receta?')">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <a th:href="@{/}" class="btn-volver">Volver al menu principal</a>
+    <section class="section">
+        <div class="container">
+            <h2 class="title is-3">Listado de Recetas</h2>
+            <form method="get" th:action="@{/recetas}" class="mb-4">
+                <div class="field is-grouped is-grouped-multiline">
+                    <div class="control">
+                        <input class="input" type="text" name="nombre" placeholder="Nombre" th:value="${param.nombre}" />
+                    </div>
+                    <div class="control">
+                        <input class="input" type="number" name="minCalorias" placeholder="Calorías mínimas" min="0" th:value="${param.minCalorias}" />
+                    </div>
+                    <div class="control">
+                        <input class="input" type="number" name="maxCalorias" placeholder="Calorías máximas" min="0" th:value="${param.maxCalorias}" />
+                    </div>
+                    <div class="control">
+                        <button class="button is-link" type="submit">Filtrar</button>
+                    </div>
+                </div>
+            </form>
+            <a th:href="@{/recetas/nueva}" class="button is-primary mb-4">Agregar Receta</a>
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Calorías totales</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="receta : ${recetas}">
+                        <td th:text="${receta.nombre}"></td>
+                        <td th:text="${receta.descripcion}"></td>
+                        <td th:text="${receta.caloriasTotales}"></td>
+                        <td>
+                            <a th:href="@{'/recetas/editar/' + ${receta.id}}" class="button is-small is-info">Editar</a>
+                            <form th:action="@{'/recetas/eliminar/' + ${receta.id}}" method="post" style="display:inline;">
+                                <button type="submit" class="button is-small is-danger" onclick="return confirm('¿Eliminar receta?')">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <a th:href="@{/}" class="button is-light mt-4">Volver al menú principal</a>
+        </div>
+    </section>
 </body>
 </html>

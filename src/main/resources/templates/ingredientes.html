@@ -3,30 +3,35 @@
 <head>
     <title>Ingredientes</title>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
     <link rel="stylesheet" th:href="@{/css/estilo.css}" />
 </head>
 <body>
-    <h2>Listado de Ingredientes</h2>
-    <a th:href="@{/ingredientes/nuevo}" class="btn-agregar">Agregar Ingrediente</a>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="ing : ${ingredientes}">
-                <td th:text="${ing.nombre}"></td>
-                <td>
-                    <a th:href="@{'/ingredientes/editar/' + ${ing.id}}">Editar</a>
-                    <form th:action="@{'/ingredientes/eliminar/' + ${ing.id}}" method="post" style="display:inline;">
-                        <button type="submit" onclick="return confirm('¿Eliminar ingrediente?')">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <a th:href="@{/}" class="btn-volver">Volver al menu principal</a>
+    <section class="section">
+        <div class="container">
+            <h2 class="title is-3">Listado de Ingredientes</h2>
+            <a th:href="@{/ingredientes/nuevo}" class="button is-primary mb-4">Agregar Ingrediente</a>
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ing : ${ingredientes}">
+                        <td th:text="${ing.nombre}"></td>
+                        <td>
+                            <a th:href="@{'/ingredientes/editar/' + ${ing.id}}" class="button is-small is-info">Editar</a>
+                            <form th:action="@{'/ingredientes/eliminar/' + ${ing.id}}" method="post" style="display:inline;">
+                                <button type="submit" class="button is-small is-danger" onclick="return confirm('¿Eliminar ingrediente?')">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <a th:href="@{/}" class="button is-light mt-4">Volver al menú principal</a>
+        </div>
+    </section>
 </body>
 </html>

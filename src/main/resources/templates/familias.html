@@ -4,58 +4,46 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Familias</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
 	<link rel="stylesheet" th:href="@{/css/estilo.css}" />
 </head>
 
 <body>
-
-	<div th:if="${mensaje}" class="alerta">
-		<p th:text="${mensaje}"></p>
-	</div>
-
-	<div class="template-1">
-		<h1>Listado de familias activas</h1>
-	</div>
-
-	<div class="menu-1">
-		<a th:href="@{/familias/agregarFamilia}">Agregar familia</a>
-		<a th:href="@{/familias/buscarFamilia}">Buscar familia</a>
-	</div>
-
-	<table>
-
-		<thead>
-			<tr>
-				<th>Número</th>
-				<th>Nombre </th>
-				<th>Fecha de alta</th>
-				<th>Fecha última asistencia recibida</th>
-				<th>Nro de integrantes activos</th>
-				<th>Opciones</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="familia : ${familias}">
-				<td th:text="${familia.nroFamilia}"></td>
-				<td th:text="${familia.nombreFamilia}"></td>
-				<td th:text="${familia.fechaAlta}"></td>
-				<td th:text="${familia.fechaUltimaAsistencia}"></td>
-				<td th:text="${familia.nroIntegrantes}"></td>
-				<td>
-					<a th:href="@{'/familias/editarFamilia/' + ${familia.nroFamilia}}" class="btn-editar">Editar</a>
-
-					<a th:href="@{'/familias/eliminar/' + ${familia.nroFamilia}}"
-						onclick="return confirm('¿Estás seguro de que deseas eliminar esta familia?');"
-						class="btn-eliminar">Eliminar</a>
-				</td>
-
-			</tr>
-
-		</tbody>
-
-
-	</table>
-	<a th:href="@{/}" class="btn-volver">Volver al menu principal</a>
+    <section class="section">
+        <div class="container">
+            <h1 class="title is-3">Listado de familias activas</h1>
+            <div class="buttons mb-4">
+                <a th:href="@{/familias/agregarFamilia}" class="button is-primary">Agregar familia</a>
+                <a th:href="@{/familias/buscarFamilia}" class="button is-link is-light">Buscar familia</a>
+            </div>
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Nombre</th>
+                        <th>Fecha de alta</th>
+                        <th>Fecha última asistencia recibida</th>
+                        <th>Nro de integrantes activos</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="familia : ${familias}">
+                        <td th:text="${familia.nroFamilia}"></td>
+                        <td th:text="${familia.nombreFamilia}"></td>
+                        <td th:text="${familia.fechaAlta}"></td>
+                        <td th:text="${familia.fechaUltimaAsistencia}"></td>
+                        <td th:text="${familia.nroIntegrantes}"></td>
+                        <td>
+                            <a th:href="@{'/familias/editarFamilia/' + ${familia.nroFamilia}}" class="button is-small is-info">Editar</a>
+                            <a th:href="@{'/familias/eliminar/' + ${familia.nroFamilia}}" class="button is-small is-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta familia?');">Eliminar</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <a th:href="@{/}" class="button is-light mt-4">Volver al menú principal</a>
+        </div>
+    </section>
 </body>
 
 </html>

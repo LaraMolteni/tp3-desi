@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Menú Principal</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
     <link rel="stylesheet" th:href="@{/css/estilo.css}" />
 </head>
 <body>
-   <div class="starter-template">
-        <h1>Centro de distribución 'El Jacaranda' </h1>
-        <h2>
-            <span th:text="'Menú principal'"></span>
-        </h2>
-    </div>
-    
-
-    <div class="menu">
-        <a th:href="@{/familias}">Familias</a>
-        <a th:href="@{/ingredientes}">Ingredientes</a>
-        <a th:href="@{/recetas}">Recetas</a>
-        <a th:href="@{/preparaciones}">Preparaciones</a>
-		<a th:href="@{/entregaAlimentos}">Entrega de alimentos</a>
-    </div>
-
+    <section class="section">
+        <div class="container">
+            <h1 class="title has-text-centered">Centro de distribución 'El Jacaranda'</h1>
+            <h2 class="subtitle has-text-centered subtitulo-menu-ppal">Menú principal</h2>
+            <div class="buttons is-centered mt-5">
+                <a th:href="@{/familias}" class="button is-link is-light">Familias</a>
+                <a th:href="@{/ingredientes}" class="button is-link is-light">Ingredientes</a>
+                <a th:href="@{/recetas}" class="button is-link is-light">Recetas</a>
+                <a th:href="@{/preparaciones}" class="button is-link is-light">Preparaciones</a>
+                <a th:href="@{/entregaAlimentos}" class="button is-link is-light">Entrega de alimentos</a>
+            </div>
+        </div>
+    </section>
 </body>
 </html>

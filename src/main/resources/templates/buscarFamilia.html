@@ -4,48 +4,55 @@
 <head>
 	<title>Listado de Familias</title>
 	<meta charset="UTF-8" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
 	<link rel="stylesheet" th:href="@{/css/estilo.css}" />
 </head>
 
 <body>
-
-	<h2>Buscar Familias</h2>
-
-	<form th:action="@{/familias/buscarFamilia}" method="get">
-		<label for="nroFamilia">Número de Familia:</label>
-		<input type="number" id="nroFamilia" name="nroFamilia" th:value="${param.nroFamilia}" />
-
-		<label for="nombre">Nombre:</label>
-		<input type="text" id="nombre" name="nombre" th:value="${param.nombre}" />
-
-		<button type="submit">Buscar</button>
-		<a th:href="@{/familias}">Limpiar</a>
-	</form>
-
-	<h2>Listado de Familias</h2>
-
-	<table>
-		<thead>
-			<tr>
-				<th>Número de Familia</th>
-				<th>Nombre</th>
-				<th>Fecha de Registro</th>
-				<th>Integrantes Activos</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="familia: ${familias}">
-				<td th:text="${familia.nroFamilia}"></td>
-				<td th:text="${familia.nombreFamilia}"></td>
-				<td th:text="${familia.fechaAlta}"></td>
-				<td th:text="${familia.fechaUltimaAsistencia}"></td>
-				<td th:text="${familia.nroIntegrantes}"></td>
-			<tr th:if="${familias == null or #lists.isEmpty(familias)}">
-				<td colspan="4">No se encontraron familias.</td>
-			</tr>
-		</tbody>
-	</table>
-
+    <section class="section">
+        <div class="container">
+            <h2 class="title is-3">Buscar Familias</h2>
+            <form th:action="@{/familias/buscarFamilia}" method="get" class="mb-4">
+                <div class="field is-grouped">
+                    <div class="control">
+                        <input class="input" type="number" id="nroFamilia" name="nroFamilia" th:value="${param.nroFamilia}" placeholder="Número de Familia" />
+                    </div>
+                    <div class="control">
+                        <input class="input" type="text" id="nombre" name="nombre" th:value="${param.nombre}" placeholder="Nombre" />
+                    </div>
+                    <div class="control">
+                        <button class="button is-link" type="submit">Buscar</button>
+                    </div>
+                    <div class="control">
+                        <a th:href="@{/familias}" class="button is-light">Limpiar</a>
+                    </div>
+                </div>
+            </form>
+            <h2 class="title is-4">Listado de Familias</h2>
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>Número de Familia</th>
+                        <th>Nombre</th>
+                        <th>Fecha de Registro</th>
+                        <th>Integrantes Activos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="familia: ${familias}">
+                        <td th:text="${familia.nroFamilia}"></td>
+                        <td th:text="${familia.nombreFamilia}"></td>
+                        <td th:text="${familia.fechaAlta}"></td>
+						<td th:text="${familia.fechaUltimaAsistencia}"></td>
+                        <td th:text="${familia.nroIntegrantes}"></td>
+                    </tr>
+                    <tr th:if="${familias == null or #lists.isEmpty(familias)}">
+                        <td colspan="4">No se encontraron familias.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 </body>
 
 </html>
