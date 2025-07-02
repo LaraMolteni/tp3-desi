@@ -1,67 +1,96 @@
 package desi.tp.servicios;
 
+import desi.tp.accesoDatos.PreparacionRepo;
+import desi.tp.entidades.Preparacion;
+import desi.tp.entidades.Receta;
+import desi.tp.exepciones.Excepcion;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import desi.tp.accesoDatos.PreparacionRepo;
-import desi.tp.entidades.Preparacion;
-import desi.tp.exepciones.Excepcion;
-
-
 @Service
 public class PreparacionServiceImpl implements PreparacionService {
 
-	@Autowired
-	private PreparacionRepo preparacionRepo;
+    @Autowired
+    private PreparacionRepo preparacionRepo;
 
-	@Override
-	public Preparacion crearPreparacion(Preparacion preparacion) throws Excepcion {
-		// Validar fecha no futura
-		if (preparacion.getFechaCoccion().isAfter(LocalDate.now())) {
-			throw new IllegalArgumentException("La fecha no puede ser futura");
-		}
-		// Validar que no haya dos preparaciones de la misma receta para el mismo día
-		boolean existe = preparacionRepo.findAll().stream().filter(Preparacion::isActiva)
-				.anyMatch(p -> p.getFechaCoccion().equals(preparacion.getFechaCoccion())
-						&& p.getTotalRacionesPreparadas().equals(preparacion.getTotalRacionesPreparadas()));
-		if (existe) {
-			throw new IllegalArgumentException("Ya existe una preparación de la misma receta para el mismo día");
-		}
-		preparacion.setActiva(true);
-		// TODO: Validar stock suficiente para ingredientes (placeholder)
-		return preparacionRepo.save(preparacion);
-	}
+    @Autowired
+    private RecetaService recetaService;
 
-	@Override
-	public Preparacion modificarPreparcion(Integer id, Preparacion datos) {
-		Optional<Preparacion> opt = preparacionRepo.findById(id);
-		if (opt.isPresent()) {
-			Preparacion preparacion = opt.get();
-			// Solo se puede editar la fecha
-			preparacion.setFechaCoccion(datos.getFechaCoccion());
-			return preparacionRepo.save(preparacion);
-		}
-		return null;
-	}
+    @Autowired
+    private StockService stockService;
 
-	@Override
-	public List<Preparacion> listarPreparaciones() {
-		return preparacionRepo.findAll().stream().filter(Preparacion::isActiva).toList();
-	}
+    @Override
+    public List<Preparacion> listarPreparacionesActivas() {
+        return preparacionRepo.findByActivaTrue();
+    }
+    
+    @Override
+    public List<Preparacion> filtrar(String nombreReceta, LocalDate fecha) {
+        return preparacionRepo.findAll().stream()
+            .filter(p -> p.isActiva())
+            .filter(p -> nombreReceta == null || p.getReceta().getNombre().toLowerCase().contains(nombreReceta.toLowerCase()))
+            .filter(p -> fecha == null || p.getFechaCoccion().equals(fecha))
+            .toList();
+    }
 
-	@Override
-	public void eliminarPreparacion(Integer id) {
-		Optional<Preparacion> opt = preparacionRepo.findById(id);
-		if (opt.isPresent()) {
-			Preparacion preparacio = opt.get();
-			preparacio.setActiva(false); // Eliminación lógica
-			preparacionRepo.save(preparacio);
-		}
 
-	}
+    @Override
+    public Preparacion buscarPorId(Integer id) {
+        return preparacionRepo.findById(id)
+                .orElseThrow(() -> new Excepcion("Preparación no encontrada."));
+    }
 
+    @Override
+    public void crearPreparacion(Preparacion preparacion)  {
+        validarPreparacion(preparacion);
+        stockService.descontarStock(preparacion);
+        preparacionRepo.save(preparacion);
+    }
+
+    @Override
+    public void eliminarPreparacion(Integer id) {
+        Preparacion p = buscarPorId(id);
+        p.setActiva(false);
+        preparacionRepo.save(p);
+    }
+
+    @Override
+    public void modificarFecha(Integer id, LocalDate nuevaFecha)  {
+        if (nuevaFecha.isAfter(LocalDate.now())) {
+            throw new Excepcion("La fecha no puede ser futura.");
+        }
+        Preparacion p = buscarPorId(id);
+        p.setFechaCoccion(nuevaFecha);
+        preparacionRepo.save(p);
+    }
+
+    private void validarPreparacion(Preparacion preparacion) {
+        if (preparacion.getFechaCoccion() == null || preparacion.getFechaCoccion().isAfter(LocalDate.now())) {
+            throw new Excepcion("La fecha es obligatoria y no puede ser futura.");
+        }
+
+        if (preparacion.getReceta() == null || preparacion.getReceta().getId() == null) {
+            throw new Excepcion("Debe seleccionar una receta.");
+        }
+
+        if (preparacion.getTotalRacionesPreparadas() == null || preparacion.getTotalRacionesPreparadas() <= 0) {
+            throw new Excepcion("Debe indicar una cantidad de raciones válida.");
+        }
+
+        Receta receta = recetaService.buscarPorId(preparacion.getReceta().getId());
+
+        Optional<Preparacion> existente = preparacionRepo.findByFechaCoccionAndRecetaAndActivaTrue(
+                preparacion.getFechaCoccion(), receta);
+        if (existente.isPresent()) {
+            throw new Excepcion("Ya existe una preparación para esa receta en esa fecha.");
+        }
+
+        stockService.validarStockSuficiente(receta, preparacion.getTotalRacionesPreparadas());
+
+        preparacion.setReceta(receta);
+    }
 }

@@ -15,12 +15,18 @@
                 <thead>
                     <tr>
                         <th>Nombre</th>
-                        <th>Acciones</th>
+						<th>Stock Disponible</th>
+						<th>Precio</th>
+						<th>Acciones</th>
+							
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="ing : ${ingredientes}">
                         <td th:text="${ing.nombre}"></td>
+						<td th:text="${ing.stockDisponible}"></td>
+						<td th:text="${ing.precioActual}"></td>
+
                         <td>
                             <a th:href="@{'/ingredientes/editar/' + ${ing.id}}" class="button is-small is-info">Editar</a>
                             <form th:action="@{'/ingredientes/eliminar/' + ${ing.id}}" method="post" style="display:inline;">

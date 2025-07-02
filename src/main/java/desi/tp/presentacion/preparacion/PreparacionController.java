@@ -1,71 +1,80 @@
 package desi.tp.presentacion.preparacion;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import desi.tp.entidades.Preparacion;
 import desi.tp.servicios.PreparacionService;
+import desi.tp.servicios.RecetaService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-
+import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 @RequestMapping("/preparaciones")
 public class PreparacionController {
-	
+
     @Autowired
     private PreparacionService preparacionService;
 
-    /*@PostMapping
-    public Preparacion crearPreparacion(@RequestBody Preparacion preparacion) throws Excepcion {
-        if (preparacion.getFechaCoccion() == null || preparacion.getTotalRacionesPreparadas() == null || preparacion.getTotalRacionesPreparadas().isEmpty()) {
-            throw new IllegalArgumentException("Fecha y raciones son requeridas");
-        }
-        return preparacionService.crearPreparacion(preparacion);
-    }*/
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Preparacion> modificarPreparacion(@PathVariable Integer id, @RequestBody Preparacion datos) {
-        // Solo se puede editar la fecha
-    	Preparacion actualizado = preparacionService.modificarPreparcion(id, datos);
-        if (actualizado != null) {
-            return ResponseEntity.ok(actualizado);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+    @Autowired
+    private RecetaService recetaService;
 
     @GetMapping
-    public List<Preparacion> listarPreparaciones() {
-        return preparacionService.listarPreparaciones();
+    public String listarPreparaciones(@RequestParam(required = false) String receta,
+                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+                                       Model model) {
+        List<Preparacion> filtradas = preparacionService.filtrar(receta, fecha);
+        model.addAttribute("preparaciones", filtradas);
+        return "preparaciones/list";
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarPreparacion(@PathVariable Integer id) {
+
+    @GetMapping("/nueva")
+    public String nuevaPreparacion(Model model) {
+        model.addAttribute("preparacion", new Preparacion());
+        model.addAttribute("recetas", recetaService.listarRecetas());
+        return "preparaciones/form";
+    }
+
+    @PostMapping("/guardar")
+    public String guardarPreparacion(@ModelAttribute Preparacion preparacion, RedirectAttributes redirect) {
+        try {
+            preparacionService.crearPreparacion(preparacion);
+            redirect.addFlashAttribute("success", "Preparación creada exitosamente.");
+            return "redirect:/preparaciones";
+        } catch (Exception e) {
+            redirect.addFlashAttribute("error", e.getMessage());
+            return "redirect:/preparaciones/nueva";
+        }
+    }
+
+    @GetMapping("/editar/{id}")
+    public String editarPreparacion(@PathVariable Integer id, Model model) {
+        Preparacion preparacion = preparacionService.buscarPorId(id);
+        model.addAttribute("preparacion", preparacion);
+        return "preparaciones/edit";
+    }
+
+    @PostMapping("/modificar")
+    public String modificarPreparacion(@ModelAttribute Preparacion preparacion, RedirectAttributes redirect) {
+        try {
+            preparacionService.modificarFecha(preparacion.getId(), preparacion.getFechaCoccion());
+            redirect.addFlashAttribute("success", "Fecha modificada correctamente.");
+        } catch (Exception e) {
+            redirect.addFlashAttribute("error", e.getMessage());
+            return "redirect:/preparaciones/editar/" + preparacion.getId();
+        }
+        return "redirect:/preparaciones";
+    }
+
+    @PostMapping("/eliminar/{id}")
+    public String eliminarPreparacion(@PathVariable Integer id, RedirectAttributes redirect) {
         preparacionService.eliminarPreparacion(id);
-        return ResponseEntity.noContent().build();
+        redirect.addFlashAttribute("success", "Preparación eliminada correctamente.");
+        return "redirect:/preparaciones";
     }
-
-    // Endpoint para filtrar por fecha y nombre de receta
-    @GetMapping("/buscar")
-    public List<Preparacion> buscarPreparaciones(@RequestParam(required = false) String fecha,
-                                                            @RequestParam(required = false) String nombreReceta) {
-        return preparacionService.listarPreparaciones().stream()
-            .filter(p -> (fecha == null || p.getFechaCoccion().toString().equals(fecha)))
-            .filter(p -> (nombreReceta == null || p.getReceta().getPreparaciones().stream().anyMatch(r -> r.getReceta().getNombre().toLowerCase().contains(nombreReceta.toLowerCase()))))
-            .toList();
-    }
-
-    
-    
 }
-

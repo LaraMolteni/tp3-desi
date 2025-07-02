@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Preparación</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}" />
+</head>
+<body>
+<section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column">
+                <div>
+                    <h1 class="title is-3 has-text-light">Editar Fecha de Preparación</h1>
+
+                    <div th:if="${success}" class="notification is-success" th:text="${success}"></div>
+                    <div th:if="${error}" class="notification is-danger" th:text="${error}"></div>
+					
+					<div class="field">
+						<p class="subtitle is-static" th:text="${preparacion.receta.nombre}"></p>
+					</div>
+
+
+                    <form th:action="@{/preparaciones/modificar}" method="post" th:object="${preparacion}">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <div class="field">
+                            <label class="label has-text-light">Nueva Fecha de Cocción:</label>
+                            <div class="control">
+                                <input class="input" type="date" th:field="*{fechaCoccion}" required>
+                            </div>
+                        </div>
+
+                        <div class="field is-grouped is-grouped-right">
+                            <p class="control">
+                                <button type="submit" class="button is-primary">Actualizar</button>
+                            </p>
+                            <p class="control">
+                                <a class="button is-light" th:href="@{/preparaciones}">Cancelar</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

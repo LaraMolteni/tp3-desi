@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Listado de Preparaciones</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}" />
+</head>
+<body>
+<section class="section">
+    <div class="container">
+        <h1 class="title is-3">Listado de Preparaciones</h1>
+
+        <div th:if="${success}" class="notification is-success" th:text="${success}"></div>
+        <div th:if="${error}" class="notification is-danger" th:text="${error}"></div>
+		
+		<form class="mb-4" method="get" th:action="@{/preparaciones}">
+		            <div class="columns">
+		                <div class="column">
+		                    <div class="field">
+		                        <label class="label">Filtrar por fecha:</label>
+		                        <div class="control">
+		                            <input class="input" type="date" name="fecha" th:value="${param.fecha}" />
+		                        </div>
+		                    </div>
+		                </div>
+		                <div class="column">
+		                    <div class="field">
+		                        <label class="label">Filtrar por receta:</label>
+		                        <div class="control">
+		                            <input class="input" type="text" name="receta" placeholder="Nombre de receta" th:value="${param.receta}" />
+		                        </div>
+		                    </div>
+		                </div>
+		                <div class="column is-narrow">
+		                    <div class="field is-grouped mt-5">
+		                        <div class="control">
+		                            <button type="submit" class="button is-primary">Filtrar</button>
+		                        </div>
+		                        <div class="control">
+		                            <a class="button is-light" th:href="@{/preparaciones}">Limpiar</a>
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+		        </form>
+
+        <div class="mt-4 mb-4 has-text-right">
+            <a class="button is-primary" th:href="@{/preparaciones/nueva}">Nueva Preparación</a>
+        </div>
+		
+		<table class="table is-striped is-hoverable is-fullwidth">
+			<thead>
+			               <tr>
+			                   <th>Fecha Coccion</th>
+			                   <th>Receta</th>
+			                   <th>Raciones</th>
+							   <th>Calorias por plato</th>
+			                   <th>Acciones</th>
+			               </tr>
+			           </thead>
+					   <tbody>
+					       <tr th:each="prep : ${preparaciones}">
+					           <td th:text="${prep.fechaCoccion}"></td>
+					           <td th:text="${prep.receta.nombre}"></td>
+					           <td th:text="${prep.totalRacionesPreparadas}"></td>
+							   <td th:text="${prep.receta.caloriasTotales}"></td>
+					           <td>
+					               <a th:href="@{'/preparaciones/editar/' + ${prep.id}}" class="button is-small is-info">Editar</a>
+					               <form th:action="@{'/preparaciones/eliminar/' + ${prep.id}}" method="post" style="display:inline;">
+					                   <button type="submit" class="button is-small is-danger" onclick="return confirm('¿Eliminar preparacion?')">Eliminar</button>
+					               </form>
+					           </td>
+					       </tr>
+					   </tbody>
+		</table>
+		<a th:href="@{/}" class="button is-light mt-4">Volver al menú principal</a>
+
+	</div>
+</section>
+
+</body>
+</html>
+

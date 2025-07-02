@@ -67,6 +67,11 @@ public class RecetaServiceImpl implements RecetaService {
 		
 	}
 	
+	@Override
+	public Receta buscarPorId(Integer id) {
+	    return recetaRepo.findById(id)
+	        .orElseThrow(() -> new Excepcion("Receta no encontrada."));
+	}
 	
 	
 }
