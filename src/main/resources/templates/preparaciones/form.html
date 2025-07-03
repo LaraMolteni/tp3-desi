@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Nueva Preparación</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
+	<link rel="stylesheet" th:href="@{/css/estilo.css}" />
+</head>
+
+<body>
+	<section class="section">
+		<div class="container">
+			<div class="columns is-centered">
+				<div class="column">
+					<div>
+						<h1 class="title is-3 ">Nueva Preparación</h1>
+
+						<div th:if="${success}" class="notification is-success" th:text="${success}"></div>
+						<div th:if="${error}" class="notification is-danger" th:text="${error}"></div>
+
+						<form th:action="@{/preparaciones/guardar}" method="post" th:object="${preparacion}">
+							<div class="field">
+								<label class="label">Fecha de Cocción:</label>
+								<div class="control">
+									<input class="input" type="date" th:field="*{fechaCoccion}" required>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label">Receta:</label>
+								<div class="control">
+									<div class="select is-fullwidth">
+										<select th:field="*{receta.id}" required>
+											<option th:each="receta : ${recetas}" th:value="${receta.id}"
+												th:text="${receta.nombre}"></option>
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label has-text-light">Cantidad de Raciones:</label>
+								<div class="control">
+									<input class="input" type="number" min="1" th:field="*{totalRacionesPreparadas}"
+										required>
+								</div>
+							</div>
+
+							<div class="field is-grouped is-grouped-right">
+								<p class="control">
+									<button type="submit" class="button is-primary">Guardar</button>
+								</p>
+								<p class="control">
+									<a class="button is-light" th:href="@{/preparaciones}">Cancelar</a>
+								</p>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+
+</html>

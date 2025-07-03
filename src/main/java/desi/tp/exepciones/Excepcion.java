@@ -1,6 +1,6 @@
 package desi.tp.exepciones;
 
-public class Excepcion extends Exception {
+public class Excepcion extends RuntimeException {
 
 private  String atributo;
 	

@@ -15,5 +15,6 @@ public interface RecetaService {
 	public List<Receta> listarRecetas();
 
 	public void eliminarReceta(Integer id);
-
+	
+    public Receta buscarPorId(Integer id); 
 }

@@ -4,6 +4,7 @@ package desi.tp.entidades;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +21,7 @@ public class Preparacion {
 	private Integer totalRacionesPreparadas;
 	private Integer stockRacionesRestantes;
 	private LocalDate fechaCoccion;
+	@Column(columnDefinition = "TINYINT(1)")
 	private boolean activa = true;
 	
 	@ManyToOne()

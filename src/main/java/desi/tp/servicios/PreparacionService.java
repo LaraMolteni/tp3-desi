@@ -1,18 +1,21 @@
 package desi.tp.servicios;
 
-import java.util.List;
-
 import desi.tp.entidades.Preparacion;
-import desi.tp.exepciones.Excepcion;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public interface PreparacionService {
 
-	public Preparacion crearPreparacion(Preparacion preparacion) throws Excepcion;
+    List<Preparacion> listarPreparacionesActivas();
 
-	public Preparacion modificarPreparcion(Integer id, Preparacion datos);
+    Preparacion buscarPorId(Integer id);
 
-	public List<Preparacion> listarPreparaciones();
+    void crearPreparacion(Preparacion preparacion);
 
-	public void eliminarPreparacion(Integer id);
+    void eliminarPreparacion(Integer id);
 
+    void modificarFecha(Integer id, LocalDate nuevaFecha);
+
+	List<Preparacion> filtrar(String nombreReceta, LocalDate fecha);
 }

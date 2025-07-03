@@ -1,6 +1,7 @@
 package desi.tp.presentacion.ingrediente;
 
 import desi.tp.entidades.Ingrediente;
+import desi.tp.servicios.IngredienteService;
 import desi.tp.accesoDatos.IngredienteRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,24 +17,28 @@ public class IngredienteController {
 
     @Autowired
     private IngredienteRepo ingredienteRepo;
+    
+    @Autowired
+    private IngredienteService ingredienteService;
+    
 
     @GetMapping("")
     public String listar(Model model) {
-        model.addAttribute("ingredientes", ingredienteRepo.findAll());
-        return "ingredientes";
+    	model.addAttribute("ingredientes", ingredienteService.listarTodos()); 
+        return "ingredientes/list";
     }
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         model.addAttribute("ingrediente", new Ingrediente());
-        return "agregarIngrediente";
+        return "ingredientes/form";
     }
 
     @PostMapping("/nuevo")
     public String crear(@ModelAttribute @Valid Ingrediente ingrediente, BindingResult result, Model model) {
         if (result.hasErrors() || ingrediente.getNombre() == null || ingrediente.getNombre().isBlank()) {
             model.addAttribute("error", "El nombre es requerido");
-            return "agregarIngrediente";
+            return "ingredientes/form";
         }
         ingredienteRepo.save(ingrediente);
         return "redirect:/ingredientes?success";
@@ -44,7 +49,7 @@ public class IngredienteController {
         Optional<Ingrediente> ing = ingredienteRepo.findById(id);
         if (ing.isPresent()) {
             model.addAttribute("ingrediente", ing.get());
-            return "editarIngrediente";
+            return "ingredientes/edit";
         }
         return "redirect:/ingredientes";
     }
@@ -53,7 +58,7 @@ public class IngredienteController {
     public String actualizar(@PathVariable Integer id, @ModelAttribute @Valid Ingrediente ingrediente, BindingResult result, Model model) {
         if (result.hasErrors() || ingrediente.getNombre() == null || ingrediente.getNombre().isBlank()) {
             model.addAttribute("error", "El nombre es requerido");
-            return "editarIngrediente";
+            return "ingredientes/edit";
         }
         ingrediente.setId(id);
         ingredienteRepo.save(ingrediente);
@@ -62,7 +67,7 @@ public class IngredienteController {
 
     @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Integer id) {
-        ingredienteRepo.deleteById(id);
+        ingredienteService.eliminar(id);
         return "redirect:/ingredientes?deleted";
     }
 }

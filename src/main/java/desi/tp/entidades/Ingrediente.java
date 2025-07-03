@@ -11,11 +11,25 @@ public class Ingrediente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String nombre;
-	// NOTA: al manejar las calorias desde el ItemReceta, no es necesario tener este campo acá. De todas formas se podría hacer algún alta con caloria por kg, y desp. hacer calculo automático en la receta? 
+    private Integer stockDisponible;
+    private Float precioActual;
+    private boolean activo = true;
 
+
+
+
+    // NOTA: al manejar las calorias desde el ItemReceta, no es necesario tener este campo acá. De todas formas se podría hacer algún alta con caloria por kg, y desp. hacer calculo automático en la receta? 
     public Integer getId() {
         return id;
     }
+    public boolean isActivo() { 
+    	return activo; 
+    }
+    
+    public void setActivo(boolean activo) { 
+    	this.activo = activo; 
+    }
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -25,4 +39,16 @@ public class Ingrediente {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+	public Integer getStockDisponible() {
+		return stockDisponible;
+	}
+	public void setStockDisponible(Integer stockDisponible) {
+		this.stockDisponible = stockDisponible;
+	}
+	public Float getPrecioActual() {
+		return precioActual;
+	}
+	public void setPrecioActual(Float precioActual) {
+		this.precioActual = precioActual;
+	}  
 }
