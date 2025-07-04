@@ -157,6 +157,22 @@ public class EntregaAsistenciaServiceImpl implements EntregaAsistenciaService {
         } 
     }
 	
+	@Override
+	public List<EntregaAsistencia> filtrarEntregas(LocalDate fecha, Integer idFamilia, String nombreFamilia) {
+		// Implementación básica: filtra por los parámetros si no son null
+		List<EntregaAsistencia> entregas = entregaAsistenciaRepo.findAll();
+		if (fecha != null) {
+			entregas = entregas.stream().filter(e -> fecha.equals(e.getFecha())).toList();
+		}
+		if (idFamilia != null) {
+			entregas = entregas.stream().filter(e -> e.getFamilia() != null && idFamilia.equals(e.getFamilia().getIdFamilia())).toList();
+		}
+		if (nombreFamilia != null && !nombreFamilia.isEmpty()) {
+			entregas = entregas.stream().filter(e -> e.getFamilia() != null && e.getFamilia().getNombre() != null && e.getFamilia().getNombre().toLowerCase().contains(nombreFamilia.toLowerCase())).toList();
+		}
+		return entregas;
+	}
+	
 	
 	
 	/*public void eliminarEntrega(Integer id) {
