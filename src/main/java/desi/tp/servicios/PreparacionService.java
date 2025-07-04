@@ -18,4 +18,9 @@ public interface PreparacionService {
     void modificarFecha(Integer id, LocalDate nuevaFecha);
 
 	List<Preparacion> filtrar(String nombreReceta, LocalDate fecha);
+	
+	//Metodo para guardar y actualizar las preparaciones disponibles:
+	
+	Preparacion guardar(Preparacion preparacion);
+	
 }

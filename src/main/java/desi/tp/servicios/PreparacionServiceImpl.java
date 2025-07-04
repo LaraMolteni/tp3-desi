@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 public class PreparacionServiceImpl implements PreparacionService {
 
@@ -66,6 +67,11 @@ public class PreparacionServiceImpl implements PreparacionService {
         Preparacion p = buscarPorId(id);
         p.setFechaCoccion(nuevaFecha);
         preparacionRepo.save(p);
+    }
+    @Override
+    public Preparacion guardar(Preparacion preparacion) {
+        // Guarda o actualiza la preparación existente en la base de datos
+        return preparacionRepo.save(preparacion);
     }
 
     private void validarPreparacion(Preparacion preparacion) {

@@ -24,9 +24,10 @@ public class Familia {
 	private boolean activo = true;
 	
 	
-
-	@OneToMany( cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name= "familia_fk", nullable = false)
+	// Así estaba antes:
+	//@OneToMany( cascade = CascadeType.ALL, orphanRemoval = true)
+	//@JoinColumn(name= "familia_fk", nullable = false)
+	@OneToMany(mappedBy = "familia", cascade = CascadeType.ALL, orphanRemoval = true)	
 	@Size(min =1)
 	private List<Asistido> asistidos = new ArrayList<>();
 

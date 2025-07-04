@@ -5,8 +5,14 @@ import java.util.List;
 import desi.tp.entidades.Familia;
 import desi.tp.exepciones.Excepcion;
 
+import java.util.Optional;
+
 public interface FamiliaService {
 
+	Optional<Familia> findById(Integer id);
+	
+	//Metodo para contar integrantes activos
+	int contarIntegrantesActivos(Integer idFamilia);
 	
 	public Familia crearFamilia(Familia familia) throws Excepcion;
 	
