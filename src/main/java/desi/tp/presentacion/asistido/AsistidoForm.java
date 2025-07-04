@@ -13,18 +13,20 @@ import jakarta.validation.constraints.Positive;
 
 public class AsistidoForm {
 
+	private Integer id;
 	@NotNull(message = "el dni no puede ser nulo")
 	@Min(value = 1000000, message = "El DNI debe tener al menos 7 dígitos")
 	@Max(value = 99999999, message = "El DNI no puede tener más de 8 dígitos")
 	@Positive(message = "El DNI debe ser un número positivo")
 	private Integer dni;
 
-	@NotBlank
+	@NotBlank(message = "ingrese un nombre")
 	private String nombre;
 
-	@NotBlank
+	@NotBlank(message = "ingrese un apellido")
 	private String apellido;
 
+	@NotNull(message = "La fecha de nacimiento es obligatoria")
 	@Past
 	private LocalDate fechaNacimiento;
 
@@ -52,6 +54,7 @@ public class AsistidoForm {
 
 	public static AsistidoForm desdeEntidad(Asistido a) {
 		AsistidoForm form = new AsistidoForm();
+		form.setId(a.getId());
 		form.setDni(a.getDni());
 		form.setNombre(a.getNombre());
 		form.setApellido(a.getApellido());
@@ -61,6 +64,15 @@ public class AsistidoForm {
 		form.setFechaRegistro(a.getFechaRegistro());
 		return form;
 	}
+	
+	public Integer getId() {
+		return id;
+	}
+	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 
 	public Integer getDni() {
 		return dni;

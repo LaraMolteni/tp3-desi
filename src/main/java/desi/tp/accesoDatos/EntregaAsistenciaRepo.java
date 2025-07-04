@@ -5,8 +5,8 @@ package desi.tp.accesoDatos;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import desi.tp.entidades.EntregaAsistencia;
-import desi.tp.entidades.familia;
-import java.util.LocalDate;
+import desi.tp.entidades.Familia;
+import java.time.LocalDate;
 import java.util.List;
 
 

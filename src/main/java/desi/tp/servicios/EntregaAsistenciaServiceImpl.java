@@ -156,6 +156,14 @@ public class EntregaAsistenciaServiceImpl implements EntregaAsistenciaService {
             entregaAsistenciaRepo.save(entrega);
         } 
     }
+
+
+
+	@Override
+	public List<EntregaAsistencia> filtrarEntregas(LocalDate fecha, Integer idFamilia, String nombreFamilia) {
+		
+		return null;
+	}
 	
 	
 	

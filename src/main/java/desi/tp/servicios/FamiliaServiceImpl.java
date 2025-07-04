@@ -84,8 +84,8 @@ public class FamiliaServiceImpl implements FamiliaService {
 	}
 	
 	@Override
-	public void contarIntegrantesActivos(Integer idFamilia) {
-		Optional <Familia> optFamilia = familiaRepo.findByID(idFamilia);
+	public int contarIntegrantesActivos(Integer idFamilia) {
+		Optional <Familia> optFamilia = familiaRepo.findById(idFamilia);
 		if (optFamilia.isEmpty()) {
 			return 0;
 		}
@@ -94,7 +94,13 @@ public class FamiliaServiceImpl implements FamiliaService {
 			return 0;
 		}
 		return (int) familia.getAsistidos().stream()
-							.filter(Asistido:isActivo) //Filtra solo los asistidos que están activos
+							.filter(Asistido::isActivo) //Filtra solo los asistidos que están activos
 							.count(); //Cuenta el número de asistidos activos.
+	}
+
+	@Override
+	public Optional<Familia> findById(Integer id) {
+		// TODO Auto-generated method stub
+		return Optional.empty();
 	}
 }

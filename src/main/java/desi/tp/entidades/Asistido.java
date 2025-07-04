@@ -13,8 +13,8 @@ public class Asistido extends Persona {
 	private LocalDate fechaRegistro;
 	private boolean activo = true;
 
-	@ManyToOne
-	@JoinColumn(name = "familia_fk", nullable = false) // Esta es la columna FK en la tabla de Asistido
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "familia_fk", nullable = false)
 	private Familia familia;
 	
 

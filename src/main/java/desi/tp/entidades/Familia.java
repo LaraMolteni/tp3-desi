@@ -8,7 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Size;
 
@@ -24,10 +23,8 @@ public class Familia {
 	private boolean activo = true;
 	
 	
-	// Así estaba antes:
-	//@OneToMany( cascade = CascadeType.ALL, orphanRemoval = true)
-	//@JoinColumn(name= "familia_fk", nullable = false)
-	@OneToMany(mappedBy = "familia", cascade = CascadeType.ALL, orphanRemoval = true)	
+	
+	@OneToMany(mappedBy = "familia", cascade = CascadeType.ALL)	
 	@Size(min =1)
 	private List<Asistido> asistidos = new ArrayList<>();
 

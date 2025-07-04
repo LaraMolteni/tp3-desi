@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -45,6 +44,7 @@ public class FamiliaController {
 		return familiaForm;
 	}
 
+	//Agregar familia
 	@GetMapping("/agregarFamilia")
 	public String mostrarFormulario(@ModelAttribute("familiaForm") FamiliaForm familiaForm) {
 		return "agregarFamilia";
@@ -57,7 +57,7 @@ public class FamiliaController {
 	}
 
 	@PostMapping("/guardarIntegrante")
-	public String guardarIntegrante(@ModelAttribute("asistidoForm") @Valid AsistidoForm asistidoForm,
+	public String guardarIntegrante(@Valid @ModelAttribute("asistidoForm") AsistidoForm asistidoForm,
 			BindingResult result, @ModelAttribute("familiaForm") FamiliaForm familiaForm, Model model) {
 
 		if (result.hasErrors()) {
@@ -131,7 +131,35 @@ public class FamiliaController {
 		return "editarFamilia";
 	}
 
-	@PutMapping("/editarFamilia/{id}")
+	@PostMapping("/editarIntegrante/{index}")
+	public String editarIntegrante(@PathVariable int index, @ModelAttribute("familiaForm") FamiliaForm familiaForm,
+			RedirectAttributes redirectAttributes) {
+		if (index >= 0 && index < familiaForm.getAsistidos().size()) {
+			AsistidoForm asistido = familiaForm.getAsistidos().get(index);
+			if (asistido.getFechaNacimiento() != null && asistido.getFechaNacimiento().isAfter(LocalDate.now())) {
+				redirectAttributes.addFlashAttribute("error", "La fecha de nacimiento no puede ser futura.");
+			} else {
+				redirectAttributes.addFlashAttribute("mensaje", "Integrante editado con éxito.");
+			}
+		}
+		return "redirect:/familias/editarFamilia/" + familiaForm.getIdFamilia();
+	}
+
+	@GetMapping("/eliminarIntegrante/{index}")
+	public String eliminarIntegrante(@PathVariable int index, @ModelAttribute("familiaForm") FamiliaForm familiaForm,
+			RedirectAttributes redirectAttributes) {
+
+		if (index >= 0 && index < familiaForm.getAsistidos().size()) {
+			familiaForm.getAsistidos().get(index).setActivo(false);
+			redirectAttributes.addFlashAttribute("mensaje", "Integrante marcado como inactivo.");
+		} else {
+			redirectAttributes.addFlashAttribute("error", "Índice de integrante inválido.");
+		}
+
+		return "redirect:/familias/editarFamilia/" + familiaForm.getIdFamilia();
+	}
+
+	@PostMapping("/editarFamilia/{id}")
 	public String modificarFamilia(@PathVariable Integer id, @ModelAttribute FamiliaForm form) {
 		Familia familia = form.toEntidad(); //
 		familiaService.modificarFamilia(id, familia); //
@@ -142,7 +170,7 @@ public class FamiliaController {
 
 	@PostMapping("/{id}")
 	public String procesarFormulario(@PathVariable Integer id, @ModelAttribute FamiliaForm form,
-			@RequestParam String action, RedirectAttributes redirectAttributes) {
+			@RequestParam(required = false) String action, RedirectAttributes redirectAttributes) {
 
 		if ("cancelar".equals(action)) {
 			redirectAttributes.addFlashAttribute("mensaje", "Cambios descartados.");
@@ -181,20 +209,18 @@ public class FamiliaController {
 	// Buscar familia por id y nombre
 	@GetMapping("/buscarFamilia")
 	public String buscarFamilias(@RequestParam(required = false) Integer nroFamilia,
-	                             @RequestParam(required = false) String nombre,
-	                             Model model) {
+			@RequestParam(required = false) String nombre, Model model) {
 
-	    List<Familia> resultados = familiaService.listarFamilias().stream()
-	            .filter(f -> (nroFamilia == null || f.getIdFamilia().equals(nroFamilia))
-	                      && (nombre == null || f.getNombre().toLowerCase().contains(nombre.toLowerCase())))
-	            .toList();
+		List<Familia> resultados = familiaService.listarFamilias().stream()
+				.filter(f -> (nroFamilia == null || f.getIdFamilia().equals(nroFamilia))
+						&& (nombre == null || f.getNombre().toLowerCase().contains(nombre.toLowerCase())))
+				.toList();
 
-	    model.addAttribute("id", nroFamilia); // opcional si lo usás
-	    model.addAttribute("nombre", nombre);
-	    model.addAttribute("familias", resultados);
-	    return "buscarFamilia";
+		model.addAttribute("id", nroFamilia); // opcional si lo usás
+		model.addAttribute("nombre", nombre);
+		model.addAttribute("familias", resultados);
+		return "buscarFamilia";
 	}
-
 
 	// Eliminar familia
 
