@@ -6,7 +6,6 @@ public class RegistrarEntregaRequestDTO {
     private Integer idFamilia;
     private Integer idPreparacion;
     private Integer cantidadRaciones;
-    private Integer idVoluntario; 
 
     // Getters y Setters
     public Integer getIdFamilia() {
@@ -31,13 +30,5 @@ public class RegistrarEntregaRequestDTO {
 
     public void setCantidadRaciones(Integer cantidadRaciones) {
         this.cantidadRaciones = cantidadRaciones;
-    }
-
-    public Integer getIdVoluntario() {
-        return idVoluntario;
-    }
-
-    public void setIdVoluntario(Integer idVoluntario) {
-        this.idVoluntario = idVoluntario;
     }
 }

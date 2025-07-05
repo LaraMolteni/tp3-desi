@@ -24,10 +24,6 @@ public class EntregaAsistencia {
 	private boolean activo = true;
 	
 	@ManyToOne()
-	@JoinColumn(name = "voluntario_fk", nullable = false)
-	private Voluntario voluntario;
-	
-	@ManyToOne()
 	@JoinColumn(name="familia_fk", nullable = false)
 	private Familia familia;
 	
@@ -57,14 +53,6 @@ public class EntregaAsistencia {
 
 	public void setCantidadRaciones(Integer cantidadRaciones) {
 		this.cantidadRaciones = cantidadRaciones;
-	}
-
-	public Voluntario getVoluntario() {
-		return voluntario;
-	}
-
-	public void setVoluntario(Voluntario voluntario) {
-		this.voluntario = voluntario;
 	}
 
 	public Familia getFamilia() {

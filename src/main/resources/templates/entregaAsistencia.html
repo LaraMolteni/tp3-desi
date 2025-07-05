@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Entrega de Alimentos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}" />
+</head>
+<body>
+<section class="section">
+    <div class="container">
+        <h1 class="title is-3">Entrega de alimentos</h1>
+        <!-- Formulario de registro de entrega -->
+        <form th:action="@{/entregaAsistencia/registrar}" method="post" th:object="${entregaForm}" class="box mb-5">
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Familia</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select th:field="*{idFamilia}" required>
+                                    <option value="" disabled selected>Seleccionar familia</option>
+                                    <option th:each="familia : ${familias}" th:value="${familia.idFamilia}" th:text="${familia.nombre}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Preparación</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select th:field="*{idPreparacion}" required>
+                                    <option value="" disabled selected>Seleccionar preparación</option>
+                                    <option th:each="prep : ${preparaciones}" th:value="${prep.id}" th:text="${prep.receta.nombre} + ' (' + ${prep.fechaCoccion} + ')' "></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Cantidad de raciones</label>
+                        <div class="control">
+                            <input class="input" type="number" min="1" th:field="*{cantidadRaciones}" required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field is-grouped is-grouped-right">
+                <div class="control">
+                    <button type="submit" class="button is-primary">Registrar entrega</button>
+                </div>
+            </div>
+            <div th:if="${error}" class="notification is-danger mt-4">
+                <p th:text="${error}"></p>
+            </div>
+            <div th:if="${success}" class="notification is-success mt-4">
+                <p th:text="${success}"></p>
+            </div>
+        </form>
+
+        <!-- Filtros y listado de entregas -->
+        <h2 class="title is-4 mt-6">Entregas registradas</h2>
+        <form method="get" th:action="@{/entregaAsistencia/filtrar}" class="mb-4">
+            <div class="field is-grouped">
+                <div class="control">
+                    <input class="input" type="date" name="fecha" th:value="${param.fecha}" placeholder="Fecha" />
+                </div>
+                <div class="control">
+                    <input class="input" type="text" name="nombreFamilia" th:value="${param.nombreFamilia}" placeholder="Nombre familia" />
+                </div>
+                <div class="control">
+                    <input class="input" type="number" name="idFamilia" th:value="${param.idFamilia}" placeholder="Nro familia" min="1" />
+                </div>
+                <div class="control">
+                    <button class="button is-link" type="submit">Filtrar</button>
+                </div>
+            </div>
+        </form>
+        <table class="table is-striped is-hoverable is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Nro Familia</th>
+                    <th>Nombre Familia</th>
+                    <th>Fecha Entrega</th>
+                    <th>Plato</th>
+                    <th>Cant. Raciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="entrega : ${entregas}">
+                    <td th:text="${entrega.nroFamilia}"></td>
+                    <td th:text="${entrega.nombreFamilia}"></td>
+                    <td th:text="${entrega.fechaEntrega}"></td>
+                    <td th:text="${entrega.nombrePlato}"></td>
+                    <td th:text="${entrega.cantidadRaciones}"></td>
+                </tr>
+            </tbody>
+        </table>
+        <a th:href="@{/}" class="button is-light mt-4">Volver al menú principal</a>
+    </div>
+</section>
+</body>
+</html>

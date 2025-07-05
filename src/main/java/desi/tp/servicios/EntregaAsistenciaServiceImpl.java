@@ -9,11 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import desi.tp.accesoDatos.EntregaAsistenciaRepo;
-import desi.tp.accesoDatos.VoluntarioRepo; 
 import desi.tp.entidades.EntregaAsistencia;
 import desi.tp.entidades.Familia;
 import desi.tp.entidades.Preparacion;
-import desi.tp.entidades.Voluntario;
 import desi.tp.exepciones.Excepcion;
 
 import desi.tp.entidades.Asistido;
@@ -31,23 +29,16 @@ public class EntregaAsistenciaServiceImpl implements EntregaAsistenciaService {
 	@Autowired
 	private PreparacionService preparacionService;
 
-	@Autowired 
-	private VoluntarioRepo voluntarioRepo;
-
 
 	
 	@Override
 	@Transactional 
-	public EntregaAsistencia registrarEntrega(Integer idFamilia, Integer idPreparacion, Integer cantidadRaciones, Integer idVoluntario) throws Excepcion {
-		// 1. Obtener Entidades (Familia, Preparacion, Voluntario)
-		
+	public EntregaAsistencia registrarEntrega(Integer idFamilia, Integer idPreparacion, Integer cantidadRaciones) throws Excepcion {
+		// 1. Obtener Entidades (Familia, Preparacion)
 		Familia familia = familiaService.findById(idFamilia)
 				.orElseThrow(() -> new Excepcion("Error: Familia con ID " + idFamilia + " no encontrada."));
 
 		Preparacion preparacion = preparacionService.buscarPorId(idPreparacion); // Asumiendo buscarPorId lanza Excepcion o devuelve objeto directamente
-
-		Voluntario voluntario = voluntarioRepo.findById(idVoluntario) // Asumiendo findById devuelve Optional<Voluntario>
-				.orElseThrow(() -> new Excepcion("Error: Voluntario con ID " + idVoluntario + " no encontrado."));
 
 
 		// 2. Aplicar Criterios de Aceptación (Validaciones)
@@ -88,7 +79,6 @@ public class EntregaAsistenciaServiceImpl implements EntregaAsistenciaService {
 		nuevaEntrega.setPreparacion(preparacion);
 		nuevaEntrega.setCantidadRaciones(cantidadRaciones);
 		nuevaEntrega.setFecha(fechaActual); // La fecha se asigna automáticamente al día de hoy
-		nuevaEntrega.setVoluntario(voluntario); // Asigna el voluntario que registró la entrega
 		nuevaEntrega.setActivo(true); // Se establece como activo por defecto
 
 		return entregaAsistenciaRepo.save(nuevaEntrega); // Guarda la nueva entrega
@@ -159,12 +149,6 @@ public class EntregaAsistenciaServiceImpl implements EntregaAsistenciaService {
 
 
 
-	@Override
-	public List<EntregaAsistencia> filtrarEntregas(LocalDate fecha, Integer idFamilia, String nombreFamilia) {
-		
-		return null;
-	}
-	
 	@Override
 	public List<EntregaAsistencia> filtrarEntregas(LocalDate fecha, Integer idFamilia, String nombreFamilia) {
 		// Implementación básica: filtra por los parámetros si no son null

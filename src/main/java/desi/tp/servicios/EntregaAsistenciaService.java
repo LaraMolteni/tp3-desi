@@ -10,7 +10,7 @@ import desi.tp.exepciones.Excepcion;
 
 public interface EntregaAsistenciaService {
 
-	EntregaAsistencia registrarEntrega(Integer idFamilia, Integer idPreparacion, Integer cantidadRaciones, Integer idVoluntario) throws Excepcion;
+	EntregaAsistencia registrarEntrega(Integer idFamilia, Integer idPreparacion, Integer cantidadRaciones) throws Excepcion;
 	
 	public EntregaAsistencia crearEntrega(EntregaAsistencia entrega) throws Excepcion;
 	
