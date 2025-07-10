@@ -4,6 +4,11 @@ import java.time.LocalDate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+
+
 
 @Entity
 public class Asistido extends Persona {
@@ -12,6 +17,9 @@ public class Asistido extends Persona {
 
 	private LocalDate fechaRegistro;
 	private boolean activo = true;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "familia_fk", nullable = false)

@@ -161,10 +161,21 @@ public class FamiliaController {
 
 	@PostMapping("/editarFamilia/{id}")
 	public String modificarFamilia(@PathVariable Integer id, @ModelAttribute FamiliaForm form) {
-		Familia familia = form.toEntidad(); //
-		familiaService.modificarFamilia(id, familia); //
-		return "redirect:/familias";
-	}
+		Familia existente = familiaService.obtenerFamiliaPorId(id);
+		existente.setNombre(form.getNombre());
+		existente.setFechaRegistro(form.getFechaRegistro());
+
+		List<Asistido> actualizados = form.getAsistidos().stream()
+		    .map(f -> {
+		        Asistido a = f.toEntidad();
+		        a.setFamilia(existente);  // muy importante
+		        return a;
+		    }).toList();
+
+		existente.setAsistidos(actualizados);
+
+		familiaService.modificarFamilia(id, existente);
+		return "redirect:/familias";	}
 
 	// Botones guardar cambios y cancelar
 

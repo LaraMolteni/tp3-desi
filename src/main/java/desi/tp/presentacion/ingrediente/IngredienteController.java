@@ -40,7 +40,12 @@ public class IngredienteController {
             model.addAttribute("error", "El nombre es requerido");
             return "ingredientes/form";
         }
-        ingredienteRepo.save(ingrediente);
+        // ⚠️ Convertir de kilos a gramos
+        if (ingrediente.getStockDisponible() != null) {
+            ingrediente.setStockDisponible(ingrediente.getStockDisponible() * 1000);
+        }
+
+        ingredienteService.guardar(ingrediente);
         return "redirect:/ingredientes?success";
     }
 
@@ -60,6 +65,12 @@ public class IngredienteController {
             model.addAttribute("error", "El nombre es requerido");
             return "ingredientes/edit";
         }
+        
+     // ⚠️ Convertir de kilos a gramos
+        if (ingrediente.getStockDisponible() != null) {
+            ingrediente.setStockDisponible(ingrediente.getStockDisponible() * 1000);
+        }
+        
         ingrediente.setId(id);
         ingredienteRepo.save(ingrediente);
         return "redirect:/ingredientes?success";
