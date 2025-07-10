@@ -42,6 +42,7 @@ public class AsistidoForm {
 
 	public Asistido toEntidad() {
 		Asistido a = new Asistido();
+	    a.setId(this.id);
 		a.setDni(this.dni);
 		a.setNombre(this.nombre);
 		a.setApellido(this.apellido);

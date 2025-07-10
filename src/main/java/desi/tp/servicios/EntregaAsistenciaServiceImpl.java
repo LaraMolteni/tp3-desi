@@ -65,7 +65,7 @@ public class EntregaAsistenciaServiceImpl implements EntregaAsistenciaService {
 		}
 
 		// **Validación 4: Suficiente stock de la Preparación antes de dar de baja.**
-		if (preparacion.getStockRacionesRestantes() == null || cantidadRaciones > preparacion.getStockRacionesRestantes()) {
+		if (preparacion.getTotalRacionesPreparadas() == null || cantidadRaciones > preparacion.getStockRacionesRestantes()) {
 			throw new Excepcion("Error: No hay suficiente stock de raciones para el plato '" + preparacion.getReceta().getNombre() + "'. Stock disponible: " + preparacion.getStockRacionesRestantes());
 		}
 
