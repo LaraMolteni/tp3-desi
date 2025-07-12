@@ -2,6 +2,7 @@ package desi.tp.presentacion.familia;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,165 +38,12 @@ public class FamiliaController {
 	@Autowired
 	AsistidoServiceImpl asistidoService;
 
+	// Crea un objeto familiaForm y lo guarda en el Model
 	@ModelAttribute("familiaForm")
 	public FamiliaForm familia() {
 		FamiliaForm familiaForm = new FamiliaForm();
 		familiaForm.setFechaRegistro(LocalDate.now());
 		return familiaForm;
-	}
-
-	//Agregar familia
-	@GetMapping("/agregarFamilia")
-	public String mostrarFormulario(@ModelAttribute("familiaForm") FamiliaForm familiaForm) {
-		return "agregarFamilia";
-	}
-
-	@GetMapping("/nuevoIntegrante")
-	public String nuevoIntegrante(Model model) {
-		model.addAttribute("asistidoForm", new AsistidoForm());
-		return "nuevoIntegrante";
-	}
-
-	@PostMapping("/guardarIntegrante")
-	public String guardarIntegrante(@Valid @ModelAttribute("asistidoForm") AsistidoForm asistidoForm,
-			BindingResult result, @ModelAttribute("familiaForm") FamiliaForm familiaForm, Model model) {
-
-		if (result.hasErrors()) {
-			return "nuevoIntegrante";
-		}
-
-		if (asistidoForm.getFechaNacimiento().isAfter(LocalDate.now())) {
-			result.rejectValue("fechaNacimiento", "error.fechaNacimiento",
-					"La fecha de nacimiento no puede ser futura.");
-			return "nuevoIntegrante";
-		}
-
-		// Validar DNI duplicado en la familia en memoria
-		boolean dniRepetido = familiaForm.getAsistidos().stream()
-				.anyMatch(a -> a.getDni().equals(asistidoForm.getDni()));
-
-		if (dniRepetido) {
-			result.rejectValue("dni", "error.dni", "Ya existe una persona con ese DNI en esta familia.");
-			return "nuevoIntegrante";
-		}
-
-		List<Asistido> asistidosConvertidos = familiaForm.getAsistidos().stream().map(AsistidoForm::toEntidad).toList();
-		try {
-			Asistido integrante = asistidoForm.toEntidad();
-			asistidoService.validarDni(integrante, asistidosConvertidos);
-		} catch (Excepcion e) {
-			result.rejectValue(e.getAtributo(), "error." + e.getAtributo(), e.getMessage());
-			return "nuevoIntegrante";
-		}
-
-		// Si todo está bien, agregar integrante
-		asistidoForm.setActivo(true);
-		asistidoForm.setFechaRegistro(LocalDate.now());
-		familiaForm.getAsistidos().add(asistidoForm);
-		model.addAttribute("mensaje", "Integrante agregado con éxito");
-
-		return "redirect:/familias/agregarFamilia";
-	}
-
-	@PostMapping("/agregarFamilia")
-	public String crearFamilia(@ModelAttribute("familiaForm") FamiliaForm familiaForm, BindingResult result,
-			SessionStatus status, Model model) throws Excepcion {
-
-		if (familiaForm.getNombre() == null || familiaForm.getNombre().isBlank()) {
-			result.rejectValue("nombre", "error.nombre", "El nombre es obligatorio.");
-		}
-
-		if (familiaForm.getAsistidos() == null || familiaForm.getAsistidos().isEmpty()) {
-			result.rejectValue("asistidos", "error.asistidos", "Debe agregar al menos un integrante.");
-		}
-
-		if (result.hasErrors()) {
-			return "agregarFamilia";
-		}
-
-		Familia familia = familiaForm.toEntidad();
-		familiaService.crearFamilia(familia);
-
-		status.setComplete();
-		model.addAttribute("mensaje", "Familia creada con éxito.");
-		return "redirect:/familias";
-	}
-
-	// Editar familia
-
-	@GetMapping("/editarFamilia/{id}")
-	public String mostrarFormularioEdicion(@PathVariable Integer id, Model model) {
-		Familia familia = familiaService.obtenerFamiliaPorId(id);
-		FamiliaForm form = FamiliaForm.desdeEntidad(familia);
-		model.addAttribute("familiaForm", form);
-		return "editarFamilia";
-	}
-
-	@PostMapping("/editarIntegrante/{index}")
-	public String editarIntegrante(@PathVariable int index, @ModelAttribute("familiaForm") FamiliaForm familiaForm,
-			RedirectAttributes redirectAttributes) {
-		if (index >= 0 && index < familiaForm.getAsistidos().size()) {
-			AsistidoForm asistido = familiaForm.getAsistidos().get(index);
-			if (asistido.getFechaNacimiento() != null && asistido.getFechaNacimiento().isAfter(LocalDate.now())) {
-				redirectAttributes.addFlashAttribute("error", "La fecha de nacimiento no puede ser futura.");
-			} else {
-				redirectAttributes.addFlashAttribute("mensaje", "Integrante editado con éxito.");
-			}
-		}
-		return "redirect:/familias/editarFamilia/" + familiaForm.getIdFamilia();
-	}
-
-	@GetMapping("/eliminarIntegrante/{index}")
-	public String eliminarIntegrante(@PathVariable int index, @ModelAttribute("familiaForm") FamiliaForm familiaForm,
-			RedirectAttributes redirectAttributes) {
-
-		if (index >= 0 && index < familiaForm.getAsistidos().size()) {
-			familiaForm.getAsistidos().get(index).setActivo(false);
-			redirectAttributes.addFlashAttribute("mensaje", "Integrante marcado como inactivo.");
-		} else {
-			redirectAttributes.addFlashAttribute("error", "Índice de integrante inválido.");
-		}
-
-		return "redirect:/familias/editarFamilia/" + familiaForm.getIdFamilia();
-	}
-
-	@PostMapping("/editarFamilia/{id}")
-	public String modificarFamilia(@PathVariable Integer id, @ModelAttribute FamiliaForm form) {
-		Familia existente = familiaService.obtenerFamiliaPorId(id);
-		existente.setNombre(form.getNombre());
-		existente.setFechaRegistro(form.getFechaRegistro());
-
-		List<Asistido> actualizados = form.getAsistidos().stream()
-		    .map(f -> {
-		        Asistido a = f.toEntidad();
-		        a.setFamilia(existente);  // muy importante
-		        return a;
-		    }).toList();
-
-		existente.setAsistidos(actualizados);
-
-		familiaService.modificarFamilia(id, existente);
-		return "redirect:/familias";	}
-
-	// Botones guardar cambios y cancelar
-
-	@PostMapping("/{id}")
-	public String procesarFormulario(@PathVariable Integer id, @ModelAttribute FamiliaForm form,
-			@RequestParam(required = false) String action, RedirectAttributes redirectAttributes) {
-
-		if ("cancelar".equals(action)) {
-			redirectAttributes.addFlashAttribute("mensaje", "Cambios descartados.");
-			return "redirect:/familias";
-		}
-
-		if ("guardar".equals(action)) {
-			Familia familia = form.toEntidad();
-			familiaService.modificarFamilia(id, familia);
-			redirectAttributes.addFlashAttribute("mensaje", "Cambios guardados con éxito.");
-			return "redirect:/familias";
-		}
-
-		return "redirect:/familias";
 	}
 
 	// Listar familias activas
@@ -207,17 +55,191 @@ public class FamiliaController {
 			dto.setNroFamilia(f.getIdFamilia());
 			dto.setNombreFamilia(f.getNombre());
 			dto.setFechaAlta(f.getFechaRegistro());
-			// Fecha última asistencia: no implementado, placeholder null
 			dto.setFechaUltimaAsistencia(null);
 			// Nro de integrantes activos
 			dto.setNroIntegrantes((int) f.getAsistidos().stream().filter(b -> b.isActivo()).count());
 			return dto;
 		}).toList();
 		model.addAttribute("familias", familias);
-		return "familias";
+		return "familias/familias";
+	}
+
+	// Agregar familia
+
+	@GetMapping("agregarFamilia")
+	public String mostrarFormulario(@ModelAttribute("familiaForm") FamiliaForm familiaForm) {
+		return "familias/agregarFamilia";
+	}
+
+	@GetMapping("/nuevoIntegrante")
+	public String nuevoIntegrante(Model model) {
+		model.addAttribute("asistidoForm", new AsistidoForm());
+		return "familias/nuevoIntegrante";
+	}
+
+	@PostMapping("/guardarIntegrante")
+	public String guardarIntegrante(@Valid @ModelAttribute("asistidoForm") AsistidoForm asistidoForm,
+			BindingResult result, @ModelAttribute("familiaForm") FamiliaForm familiaForm, Model model,
+			RedirectAttributes redirectAttributes) {
+
+		if (result.hasErrors()) {
+			return "familias/nuevoIntegrante";
+		}
+
+		try {
+
+			List<Asistido> existentes = familiaForm.getAsistidos().stream().map(AsistidoForm::toEntidad)
+					.collect(Collectors.toList());
+			Asistido nuevo = asistidoForm.toEntidad();
+
+			asistidoService.validarDnisFamilia(existentes, nuevo);
+
+		} catch (Excepcion e) {
+			result.rejectValue("dni", "error.dni", e.getMessage());
+			return "familias/nuevoIntegrante";
+		}
+
+		asistidoForm.setActivo(true);
+		asistidoForm.setFechaRegistro(LocalDate.now());
+		familiaForm.getAsistidos().add(asistidoForm);
+
+		redirectAttributes.addFlashAttribute("mensaje", "Integrante agregado con éxito");
+		return "redirect:/familias/agregarFamilia";
+	}
+
+	@PostMapping("/agregarFamilia")
+	public String crearFamilia(@Valid @ModelAttribute("familiaForm") FamiliaForm familiaForm, BindingResult result,
+			SessionStatus status, Model model, RedirectAttributes redirectAttributes) throws Excepcion {
+
+		if (result.hasErrors()) {
+			return "familias/agregarFamilia";
+		}
+		// Guardar familia en BD
+		familiaService.crearFamilia(familiaForm.toEntidad());
+
+		status.setComplete();
+		redirectAttributes.addFlashAttribute("mensaje", "Familia creada con éxito.");
+		return "redirect:/familias";
+	}
+
+	// Editar familia
+
+	@GetMapping("/editarFamilia/{id}")
+	public String mostrarFormularioEdicion(@PathVariable Integer id, Model model) {
+		Familia familia = familiaService.obtenerFamiliaSiExiste(id);
+		FamiliaForm form = FamiliaForm.desdeEntidad(familia);
+		model.addAttribute("familiaForm", form);
+		return "familias/editarFamilia";
+	}
+
+	@PostMapping("/editarIntegrante/{index}")
+	public String editarIntegrante(@Valid @PathVariable int index,
+			@ModelAttribute("familiaForm") FamiliaForm familiaForm, BindingResult result,
+			RedirectAttributes redirectAttributes) {
+
+		AsistidoForm asistidoEditado = familiaForm.getAsistidos().get(index);
+
+		if (asistidoEditado.getFechaNacimiento() == null) {
+			result.rejectValue("asistidos[" + index + "].fechaNacimiento", "error.fechaNacimiento",
+					"La fecha de nacimiento no puede ser vacía");
+		}
+
+		if (result.hasErrors()) {
+			redirectAttributes.addFlashAttribute("error", "Error al guardar integrante.");
+			return "redirect:/familias/editarFamilia/" + familiaForm.getIdFamilia();
+		}
+
+		redirectAttributes.addFlashAttribute("mensaje", "Integrante editado con éxito.");
+		return "redirect:/familias/editarFamilia/" + familiaForm.getIdFamilia();
+	}
+
+	@PostMapping("/eliminarIntegrante/{index}")
+	public String eliminarIntegrante(@PathVariable int index, @ModelAttribute("familiaForm") FamiliaForm familiaForm,
+			RedirectAttributes redirectAttributes) {
+		if (index >= 0 && index < familiaForm.getAsistidos().size()) {
+			familiaForm.getAsistidos().get(index).setActivo(false);
+			redirectAttributes.addFlashAttribute("mensaje", "Integrante eliminado.");
+		}
+		return "redirect:/familias/editarFamilia/" + familiaForm.getIdFamilia();
+	}
+
+	@PostMapping("/{id}")
+	public String procesarFormulario(@PathVariable Integer id, @ModelAttribute("familiaForm") FamiliaForm form,
+			@RequestParam(required = false) String action, RedirectAttributes redirectAttributes,
+			SessionStatus status) {
+
+		// Cancelar edición
+		if ("cancelar".equals(action)) {
+			status.setComplete();
+			redirectAttributes.addFlashAttribute("mensaje", "Cambios cancelados.");
+			return "redirect:/familias";
+		}
+
+		// Guardar un integrante individual
+		if (action != null && action.startsWith("guardar-")) {
+			int index = Integer.parseInt(action.replace("guardar-", ""));
+
+			if (index >= 0 && index < form.getAsistidos().size()) {
+				AsistidoForm asistidoEditado = form.getAsistidos().get(index);
+
+				if (asistidoEditado.getFechaNacimiento() != null
+						&& asistidoEditado.getFechaNacimiento().isAfter(LocalDate.now())) {
+					redirectAttributes.addFlashAttribute("error", "La fecha de nacimiento no puede ser futura.");
+					return "redirect:/familias/editarFamilia/" + id;
+				}
+
+				try {
+					Familia existente = familiaService.obtenerFamiliaSiExiste(id);
+					Familia actualizada = form.actualizarEntidad(existente, asistidoService);
+					familiaService.modificarFamilia(id, actualizada);
+					redirectAttributes.addFlashAttribute("mensaje", "Integrante guardado con éxito.");
+				} catch (Excepcion e) {
+					redirectAttributes.addFlashAttribute("error", e.getMessage());
+				}
+			}
+			return "redirect:/familias/editarFamilia/" + id;
+		}
+
+		// Eliminar un integrante individual
+		if (action != null && action.startsWith("eliminar-")) {
+			int index = Integer.parseInt(action.replace("eliminar-", ""));
+			if (index >= 0 && index < form.getAsistidos().size()) {
+				form.getAsistidos().get(index).setActivo(false);
+
+				try {
+					Familia existente = familiaService.obtenerFamiliaSiExiste(id);
+					Familia actualizada = form.actualizarEntidad(existente, asistidoService);
+					familiaService.modificarFamilia(id, actualizada);
+					redirectAttributes.addFlashAttribute("mensaje", "Integrante eliminado.");
+				} catch (Excepcion e) {
+					redirectAttributes.addFlashAttribute("error", e.getMessage());
+				}
+			}
+			return "redirect:/familias/editarFamilia/" + id;
+		}
+
+		// Guardar todos los cambios de la familia
+		if ("guardar".equals(action)) {
+			try {
+				Familia familiaExistente = familiaService.obtenerFamiliaSiExiste(id);
+				Familia actualizada = form.actualizarEntidad(familiaExistente, asistidoService);
+				familiaService.modificarFamilia(id, actualizada);
+				status.setComplete();
+				redirectAttributes.addFlashAttribute("mensaje", "Familia actualizada con éxito.");
+				return "redirect:/familias";
+			} catch (Excepcion e) {
+				redirectAttributes.addFlashAttribute("error", e.getMessage());
+				return "redirect:/familias/editarFamilia/" + id;
+			}
+
+		}
+
+		// Acción por defecto si no coincide nada
+		return "redirect:/familias";
 	}
 
 	// Buscar familia por id y nombre
+
 	@GetMapping("/buscarFamilia")
 	public String buscarFamilias(@RequestParam(required = false) Integer nroFamilia,
 			@RequestParam(required = false) String nombre, Model model) {

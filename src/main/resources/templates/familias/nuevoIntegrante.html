@@ -13,31 +13,31 @@
         <div class="container">
             <h2 class="title is-3">Nuevo integrante</h2>
             <form th:action="@{/familias/guardarIntegrante}" th:object="${asistidoForm}" method="post">
-                <div class="field">
-                    <label class="label">DNI:</label>
-                    <div class="control">
-                        <input class="input" type="text" th:field="*{dni}" required />
-                    </div>
-                    <div th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}" class="help is-danger"></div>
-                </div>
+				<div class="field">
+				    <label class="label">DNI:</label>
+				    <div class="control">
+				        <input class="input" type="number" th:field="*{dni}" />
+				    </div>
+				    <div th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}" class="help is-danger"></div>
+				</div>
                 <div class="field">
                     <label class="label">Nombre:</label>
                     <div class="control">
-                        <input class="input" type="text" th:field="*{nombre}" required />
+                        <input class="input" type="text" th:field="*{nombre}"  />
                     </div>
                     <div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="help is-danger"></div>
                 </div>
                 <div class="field">
                     <label class="label">Apellido:</label>
                     <div class="control">
-                        <input class="input" type="text" th:field="*{apellido}" required />
+                        <input class="input" type="text" th:field="*{apellido}"  />
                     </div>
                     <div th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}" class="help is-danger"></div>
                 </div>
                 <div class="field">
                     <label class="label">Fecha de nacimiento:</label>
                     <div class="control">
-                        <input class="input" type="date" th:field="*{fechaNacimiento}" required />
+                        <input class="input" type="date" th:field="*{fechaNacimiento}"  />
                     </div>
                     <div th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}" class="help is-danger"></div>
                 </div>

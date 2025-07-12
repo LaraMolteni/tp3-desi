@@ -15,7 +15,7 @@ public abstract class Persona {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected Integer id;
-	protected Integer dni;
+	protected Long dni;
 	protected String domicilio;
 	protected String nombre;
 	protected String apellido;
@@ -29,10 +29,10 @@ public abstract class Persona {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public Integer getDni() {
+	public Long getDni() {
 		return dni;
 	}
-	public void setDni(Integer dni) {
+	public void setDni(Long dni) {
 		this.dni = dni;
 	}
 	public String getDomicilio() {

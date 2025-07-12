@@ -36,8 +36,8 @@ public class EntregaAsistenciaServiceImpl implements EntregaAsistenciaService {
 	@Transactional 
 	public EntregaAsistencia registrarEntrega(Integer idFamilia, Integer idPreparacion, Integer cantidadRaciones) throws Excepcion {
 		// 1. Obtener Entidades (Familia, Preparacion)
-		Familia familia = familiaService.findById(idFamilia)
-				.orElseThrow(() -> new Excepcion("Error: Familia con ID " + idFamilia + " no encontrada."));
+		Familia familia = familiaService.obtenerFamiliaSiExiste(idFamilia);
+				
 
 		Preparacion preparacion = preparacionService.buscarPorId(idPreparacion); // Asumiendo buscarPorId lanza Excepcion o devuelve objeto directamente
 			

@@ -3,7 +3,6 @@ package desi.tp.presentacion.asistido;
 import java.time.LocalDate;
 
 import desi.tp.entidades.Asistido;
-
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -14,22 +13,23 @@ import jakarta.validation.constraints.Positive;
 public class AsistidoForm {
 
 	private Integer id;
-	@NotNull(message = "el dni no puede ser nulo")
+	@NotNull(message = "El dni no puede ser nulo")
 	@Min(value = 1000000, message = "El DNI debe tener al menos 7 dígitos")
 	@Max(value = 99999999, message = "El DNI no puede tener más de 8 dígitos")
 	@Positive(message = "El DNI debe ser un número positivo")
-	private Integer dni;
+	private Long dni;
 
-	@NotBlank(message = "ingrese un nombre")
+	@NotBlank(message = "El nombre es obligatorio.")
 	private String nombre;
 
-	@NotBlank(message = "ingrese un apellido")
+	@NotBlank(message = "El apellido es obligatorio.")
 	private String apellido;
 
-	@NotNull(message = "La fecha de nacimiento es obligatoria")
-	@Past
+	@Past(message = "La fecha de nacimiento no puede ser futura.")
+	@NotNull(message = "La fecha de nacimiento es obligatoria.")
 	private LocalDate fechaNacimiento;
 
+	@NotBlank
 	private String ocupacion;
 
 	private boolean activo;
@@ -40,9 +40,17 @@ public class AsistidoForm {
 
 	}
 
+	// Para agregar uno nuevo
 	public Asistido toEntidad() {
-		Asistido a = new Asistido();
-	    a.setId(this.id);
+		return toEntidad(null);
+	}
+
+	// Para editar sin perder info previa
+	public Asistido toEntidad(Asistido a) {
+		if (a == null) {
+			a = new Asistido();
+		}
+		a.setId(this.id);
 		a.setDni(this.dni);
 		a.setNombre(this.nombre);
 		a.setApellido(this.apellido);
@@ -65,17 +73,16 @@ public class AsistidoForm {
 		form.setFechaRegistro(a.getFechaRegistro());
 		return form;
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
-
-	public Integer getDni() {
+	public Long getDni() {
 		return dni;
 	}
 
@@ -95,7 +102,7 @@ public class AsistidoForm {
 		this.fechaRegistro = fechaRegistro;
 	}
 
-	public void setDni(Integer dni) {
+	public void setDni(Long dni) {
 		this.dni = dni;
 	}
 

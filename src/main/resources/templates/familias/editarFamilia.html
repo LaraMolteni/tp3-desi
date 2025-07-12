@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Editar Familia</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
+	<link rel="stylesheet" th:href="@{/css/estilo.css}" />
+</head>
+
+<body>
+	<section class="section">
+		<div class="container">
+			<h2 class="title is-3">Editar Familia</h2>
+
+			<div class="notification is-danger" th:if="${error}">
+				<p th:text="${error}"></p>
+			</div>
+
+			<form th:action="@{'/familias/' + ${familiaForm.idFamilia}}" th:object="${familiaForm}" method="post">
+				<div class="field">
+					<label class="label">Nro Familia:</label>
+					<div class="control">
+						<input class="input" type="text" th:field="*{idFamilia}" readonly />
+					</div>
+				</div>
+
+				<div class="field">
+					<label class="label">Nombre:</label>
+					<div class="control">
+						<input class="input" type="text" th:field="*{nombre}" />
+					</div>
+					<div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="help is-danger"></div>
+				</div>
+
+				<h3 class="title is-5 mt-5">Integrantes</h3>
+				<table class="table is-striped is-hoverable is-fullwidth">
+					<thead>
+						<tr>
+							<th>DNI</th>
+							<th>Apellido</th>
+							<th>Nombre</th>
+							<th>Fecha de nacimiento</th>
+							<th>Ocupación</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="asistido, iterStat : *{asistidos}" th:if="${asistido.activo}">
+							<!-- Campos ocultos -->
+							<input type="hidden" th:field="*{asistidos[__${iterStat.index}__].id}" />
+							<input type="hidden" th:field="*{asistidos[__${iterStat.index}__].activo}" />
+							<input type="hidden" th:field="*{asistidos[__${iterStat.index}__].fechaRegistro}" />
+
+							<td><input class="input is-small" type="number"
+									th:field="*{asistidos[__${iterStat.index}__].dni}" />
+								<div th:if="${#fields.hasErrors('asistidos[' + iterStat.index + '].dni')}"
+									th:errors="*{asistidos[__${iterStat.index}__].dni}" class="help is-danger"></div>
+							</td>
+							<td><input class="input is-small" type="text"
+									th:field="*{asistidos[__${iterStat.index}__].apellido}" />
+								<div th:if="${#fields.hasErrors('asistidos[' + iterStat.index + '].apellido')}"
+									th:errors="*{asistidos[__${iterStat.index}__].apellido}" class="help is-danger">
+								</div>
+							</td>
+							<td><input class="input is-small" type="text"
+									th:field="*{asistidos[__${iterStat.index}__].nombre}" />
+								<div th:if="${#fields.hasErrors('asistidos[' + iterStat.index + '].nombre')}"
+									th:errors="*{asistidos[__${iterStat.index}__].nombre}" class="help is-danger"></div>
+							</td>
+							<td><input class="input is-small" type="date"
+									th:field="*{asistidos[__${iterStat.index}__].fechaNacimiento}" />
+								<div th:if="${#fields.hasErrors('asistidos[' + iterStat.index + '].fechaNacimiento')}"
+									th:errors="*{asistidos[__${iterStat.index}__].fechaNacimiento}"
+									class="help is-danger"></div>
+							</td>
+							<td>
+								<div class="select is-small">
+									<select th:field="*{asistidos[__${iterStat.index}__].ocupacion}">
+										<option value="">-- Seleccione --</option>
+										<option value="desempleado">Desempleado</option>
+										<option value="empleado">Empleado</option>
+										<option value="estudiante">Estudiante</option>
+										<option value="ama de casa">Ama de casa</option>
+										<option value="otro">Otro</option>
+									</select>
+								</div>
+							</td>
+							<td class="is-flex">
+								<button class="button is-small is-success mr-2" type="submit" name="action"
+									th:value="${'guardar-' + iterStat.index}">Guardar</button>
+								<button class="button is-small is-danger" type="submit" name="action"
+									th:value="${'eliminar-' + iterStat.index}">Eliminar</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<div class="buttons">
+					<button class="button is-primary" type="submit" name="action" value="guardar">Guardar todos</button>
+					<button class="button is-light" type="submit" name="action" value="cancelar">Cancelar</button>
+				</div>
+			</form>
+		</div>
+	</section>
+</body>
+
+</html>
