@@ -22,9 +22,9 @@
 				<div class="field">
 					<label class="label">Nombre:</label>
 					<div class="control">
-						<input class="input" type="text" th:field="*{nombre}" />
+					    <input class="input" type="text" th:field="*{nombreFamilia}" />
 					</div>
-					<div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="help is-danger"></div>
+					<div th:if="${#fields.hasErrors('nombreFamilia')}" th:errors="*{nombreFamilia}" class="help is-danger"></div>
 				</div>
 
 				<h3 class="title is-5 mt-5">Integrantes</h3>

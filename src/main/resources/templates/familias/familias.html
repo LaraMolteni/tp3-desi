@@ -21,8 +21,25 @@
 			</div>
 			<div class="buttons mb-4">
 				<a th:href="@{/familias/agregarFamilia}" class="button is-primary">Agregar familia</a>
-				<a th:href="@{/familias/buscarFamilia}" class="button is-link is-light">Buscar familia</a>
 			</div>
+			<form method="get" th:action="@{/familias/filtrar}" class="mb-4">
+				<div class="field is-grouped">
+					<div class="control">
+						<input class="input" type="text" name="nombre" th:value="${param.nombre}"
+							placeholder="Nombre familia" />
+					</div>
+					<div class="control">
+						<input class="input" type="number" name="nroFamilia" th:value="${param.nroFamilia}"
+							placeholder="Numero de familia" min="1" />
+					</div>
+					<div class="control">
+						<button class="button is-link" type="submit">Filtrar</button>
+					</div>
+					<div class="control">
+						<a class="button is-light" th:href="@{/familias/filtrar}">Ver todas</a>
+					</div>
+				</div>
+			</form>
 			<table class="table is-striped is-hoverable is-fullwidth">
 				<thead>
 					<tr>
@@ -39,7 +56,9 @@
 						<td th:text="${familia.nroFamilia}"></td>
 						<td th:text="${familia.nombreFamilia}"></td>
 						<td th:text="${familia.fechaAlta}"></td>
-						<td th:text="${familia.fechaUltimaAsistencia}"></td>
+						<td
+							th:text="${familia.fechaUltimaAsistencia != null ? #temporals.format(familia.fechaUltimaAsistencia, 'dd/MM/yyyy') : 'Sin entregas'}">
+						</td>
 						<td th:text="${familia.nroIntegrantes}"></td>
 						<td>
 							<a th:href="@{'/familias/editarFamilia/' + ${familia.nroFamilia}}"
@@ -47,6 +66,13 @@
 							<a th:href="@{'/familias/eliminar/' + ${familia.nroFamilia}}"
 								class="button is-small is-danger"
 								onclick="return confirm('¿Estás seguro de que deseas eliminar esta familia?');">Eliminar</a>
+						</td>
+					</tr>
+					<tr th:if="${#lists.isEmpty(familias)}">
+						<td colspan="6">
+							<div class="notification is-warning has-text-centered">
+								No se encontraron resultados para los filtros aplicados.
+							</div>
 						</td>
 					</tr>
 				</tbody>

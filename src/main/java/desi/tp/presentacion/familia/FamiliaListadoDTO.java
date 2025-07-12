@@ -2,6 +2,10 @@ package desi.tp.presentacion.familia;
 
 import java.time.LocalDate;
 
+import desi.tp.entidades.Asistido;
+import desi.tp.entidades.Familia;
+import desi.tp.servicios.FamiliaService;
+
 public class FamiliaListadoDTO {
 	
     private Integer nroFamilia;
@@ -40,5 +44,16 @@ public class FamiliaListadoDTO {
     public void setNroIntegrantes(Integer nroIntegrantes) {
         this.nroIntegrantes = nroIntegrantes;
     }
+    
+    public static FamiliaListadoDTO from(Familia f, FamiliaService familiaService) {
+    	FamiliaListadoDTO dto = new FamiliaListadoDTO();
+    	dto.setNroFamilia(f.getIdFamilia());
+    	dto.setNombreFamilia(f.getNombre());
+    	dto.setFechaAlta(f.getFechaRegistro());
+    	dto.setFechaUltimaAsistencia(familiaService.obtenerUltimaAsistenciaDeFamilia(f.getIdFamilia()));
+    	dto.setNroIntegrantes((int) f.getAsistidos().stream().filter(Asistido::isActivo).count());
+    	return dto;
+    }
+
 }
 

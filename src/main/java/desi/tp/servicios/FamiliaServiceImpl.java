@@ -7,8 +7,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import desi.tp.accesoDatos.EntregaAsistenciaRepo;
 import desi.tp.accesoDatos.FamiliaRepo;
 import desi.tp.entidades.Asistido;
+import desi.tp.entidades.EntregaAsistencia;
 import desi.tp.entidades.Familia;
 import desi.tp.exepciones.Excepcion;
 import jakarta.transaction.Transactional;
@@ -21,14 +23,16 @@ public class FamiliaServiceImpl implements FamiliaService {
 
 	@Autowired
 	private AsistidoServiceImpl asistidoService;
+	
+	@Autowired
+	private EntregaAsistenciaRepo entregaAsistenciaRepo;
+
 
 	@Override
 	public Familia crearFamilia(Familia familia) throws Excepcion {
 		// Setear fecha de alta y activa por defecto
 		familia.setFechaRegistro(LocalDate.now());
 		familia.setActivo(true);
-
-		// asistidoService.validarDnisFamilia(familia.getAsistidos());
 
 		return familiaRepo.save(familia);
 	}
@@ -82,4 +86,17 @@ public class FamiliaServiceImpl implements FamiliaService {
 		return familiaRepo.findById(idFamilia)
 				.orElseThrow(() -> new Excepcion("familia", "No se encontró la familia con ID: " + idFamilia));
 	}
+	
+	@Override
+	public LocalDate obtenerUltimaAsistenciaDeFamilia(Integer idFamilia) {
+		return entregaAsistenciaRepo.findAll().stream()
+			.filter(e -> e.isActivo()
+				&& e.getFamilia() != null
+				&& e.getFamilia().getIdFamilia().equals(idFamilia)
+				&& e.getFecha() != null)
+			.map(EntregaAsistencia::getFecha)
+			.max(LocalDate::compareTo)
+			.orElse(null); // devuelve null si no hay entregas
+	}
+
 }

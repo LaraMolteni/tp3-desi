@@ -50,16 +50,9 @@ public class FamiliaController {
 
 	@GetMapping
 	public String listarFamilias(Model model) {
-		List<FamiliaListadoDTO> familias = familiaService.listarFamilias().stream().map(f -> {
-			FamiliaListadoDTO dto = new FamiliaListadoDTO();
-			dto.setNroFamilia(f.getIdFamilia());
-			dto.setNombreFamilia(f.getNombre());
-			dto.setFechaAlta(f.getFechaRegistro());
-			dto.setFechaUltimaAsistencia(null);
-			// Nro de integrantes activos
-			dto.setNroIntegrantes((int) f.getAsistidos().stream().filter(b -> b.isActivo()).count());
-			return dto;
-		}).toList();
+		List<FamiliaListadoDTO> familias = familiaService.listarFamilias().stream()
+				.map(f -> FamiliaListadoDTO.from(f, familiaService)).toList();
+
 		model.addAttribute("familias", familias);
 		return "familias/familias";
 	}
@@ -240,19 +233,20 @@ public class FamiliaController {
 
 	// Buscar familia por id y nombre
 
-	@GetMapping("/buscarFamilia")
+	@GetMapping("/filtrar")
 	public String buscarFamilias(@RequestParam(required = false) Integer nroFamilia,
 			@RequestParam(required = false) String nombre, Model model) {
 
-		List<Familia> resultados = familiaService.listarFamilias().stream()
-				.filter(f -> (nroFamilia == null || f.getIdFamilia().equals(nroFamilia))
-						&& (nombre == null || f.getNombre().toLowerCase().contains(nombre.toLowerCase())))
+		List<FamiliaListadoDTO> resultados = familiaService.listarFamilias().stream()
+				.map(f -> FamiliaListadoDTO.from(f, familiaService))
+				.filter(f -> (nroFamilia == null || f.getNroFamilia().equals(nroFamilia))
+						&& (nombre == null || f.getNombreFamilia().toLowerCase().contains(nombre.toLowerCase())))
 				.toList();
 
-		model.addAttribute("id", nroFamilia); // opcional si lo usás
+		model.addAttribute("id", nroFamilia); //
 		model.addAttribute("nombre", nombre);
 		model.addAttribute("familias", resultados);
-		return "buscarFamilia";
+		return "familias/familias";
 	}
 
 	// Eliminar familia

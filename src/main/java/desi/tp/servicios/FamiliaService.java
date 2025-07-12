@@ -1,5 +1,6 @@
 package desi.tp.servicios;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import desi.tp.entidades.Familia;
@@ -19,5 +20,7 @@ public interface FamiliaService {
 
 	// Metodo para contar integrantes activos
 	public int contarIntegrantesActivos(Integer idFamilia);
+	
+	public LocalDate obtenerUltimaAsistenciaDeFamilia(Integer idFamilia);
 
 }

@@ -17,7 +17,7 @@ public class FamiliaForm {
 	private Integer idFamilia;
 
 	@NotBlank(message = "El nombre es obligatorio.")
-	private String nombre;
+	private String nombreFamilia;
 
 	private LocalDate fechaRegistro;
 
@@ -31,7 +31,7 @@ public class FamiliaForm {
 	public Familia toEntidad() {
 		Familia f = new Familia();
 		f.setIdFamilia(this.idFamilia);
-		f.setNombre(this.nombre);
+		f.setNombre(this.nombreFamilia);
 		f.setFechaRegistro(this.fechaRegistro);
 		f.setActivo(true);
 		List<Asistido> listaAsistidos = this.asistidos.stream().map(a -> {
@@ -45,7 +45,7 @@ public class FamiliaForm {
 	}
 
 	public Familia actualizarEntidad(Familia existente, AsistidoService asistidoService) {
-		existente.setNombre(this.nombre);
+		existente.setNombre(this.nombreFamilia);
 
 		List<Asistido> listaActualizada = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public class FamiliaForm {
 	public static FamiliaForm desdeEntidad(Familia f) {
 		FamiliaForm form = new FamiliaForm();
 		form.setIdFamilia(f.getIdFamilia());
-		form.setNombre(f.getNombre());
+		form.setNombreFamilia(f.getNombre());
 		form.setFechaRegistro(f.getFechaRegistro());
 		form.setAsistidos(f.getAsistidos().stream().map(AsistidoForm::desdeEntidad).toList());
 		return form;
@@ -80,12 +80,12 @@ public class FamiliaForm {
 		this.idFamilia = idFamilia;
 	}
 
-	public String getNombre() {
-		return nombre;
+	public String getNombreFamilia() {
+		return nombreFamilia;
 	}
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public void setNombreFamilia(String nombreFamilia) {
+		this.nombreFamilia = nombreFamilia;
 	}
 
 	public LocalDate getFechaRegistro() {

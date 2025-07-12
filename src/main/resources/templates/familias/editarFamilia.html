@@ -28,9 +28,10 @@
 				<div class="field">
 					<label class="label">Nombre:</label>
 					<div class="control">
-						<input class="input" type="text" th:field="*{nombre}" />
+						<input class="input" type="text" th:field="*{nombreFamilia}" />
 					</div>
-					<div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="help is-danger"></div>
+					<div th:if="${#fields.hasErrors('nombreFamilia')}" th:errors="*{nombreFamilia}"
+						class="help is-danger"></div>
 				</div>
 
 				<h3 class="title is-5 mt-5">Integrantes</h3>
@@ -55,7 +56,8 @@
 							<td><input class="input is-small" type="number"
 									th:field="*{asistidos[__${iterStat.index}__].dni}" />
 								<div th:if="${#fields.hasErrors('asistidos[' + iterStat.index + '].dni')}"
-									th:errors="*{asistidos[__${iterStat.index}__].dni}" class="help is-danger"></div>
+									th:errors="*{asistidos[__${iterStat.index}__].dni}" class="help is-danger">
+								</div>
 							</td>
 							<td><input class="input is-small" type="text"
 									th:field="*{asistidos[__${iterStat.index}__].apellido}" />
@@ -66,7 +68,8 @@
 							<td><input class="input is-small" type="text"
 									th:field="*{asistidos[__${iterStat.index}__].nombre}" />
 								<div th:if="${#fields.hasErrors('asistidos[' + iterStat.index + '].nombre')}"
-									th:errors="*{asistidos[__${iterStat.index}__].nombre}" class="help is-danger"></div>
+									th:errors="*{asistidos[__${iterStat.index}__].nombre}" class="help is-danger">
+								</div>
 							</td>
 							<td><input class="input is-small" type="date"
 									th:field="*{asistidos[__${iterStat.index}__].fechaNacimiento}" />
@@ -97,7 +100,8 @@
 				</table>
 
 				<div class="buttons">
-					<button class="button is-primary" type="submit" name="action" value="guardar">Guardar todos</button>
+					<button class="button is-primary" type="submit" name="action" value="guardar">Guardar
+						todos</button>
 					<button class="button is-light" type="submit" name="action" value="cancelar">Cancelar</button>
 				</div>
 			</form>
