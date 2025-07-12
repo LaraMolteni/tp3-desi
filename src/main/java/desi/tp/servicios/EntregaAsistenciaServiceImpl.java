@@ -44,10 +44,10 @@ public class EntregaAsistenciaServiceImpl implements EntregaAsistenciaService {
 			//Por un error al cargar los interger como nulos y compararlos con int para validar si hay raciones. 
 			// Se agrega una condición para reemplazar los null por 0, solo si son null.
 		if (preparacion.getStockRacionesRestantes() == null) {
-		    preparacion.setStockRacionesRestantes(0);
+			preparacion.setStockRacionesRestantes(0);
 		}
 		if (preparacion.getTotalRacionesPreparadas() == null) {
-		    preparacion.setTotalRacionesPreparadas(0);
+			preparacion.setTotalRacionesPreparadas(0);
 		}
 
 		// 2. Aplicar Criterios de Aceptación (Validaciones)
@@ -74,8 +74,8 @@ public class EntregaAsistenciaServiceImpl implements EntregaAsistenciaService {
 		}
 
 		// **Validación 4: Suficiente stock de la Preparación antes de dar de baja.**
-		if (preparacion.getTotalRacionesPreparadas() == null || cantidadRaciones > preparacion.getStockRacionesRestantes()) {
-			throw new Excepcion("Error: No hay suficiente stock de raciones para el plato '" + preparacion.getReceta().getNombre() + "'. Stock disponible: " + preparacion.getStockRacionesRestantes());
+		if (preparacion.getStockRacionesRestantes() == null || cantidadRaciones > preparacion.getStockRacionesRestantes()) {
+			throw new Excepcion("Error: No hay suficientes raciones disponibles para el plato '" + preparacion.getReceta().getNombre() + "'. Raciones disponibles: " + (preparacion.getStockRacionesRestantes() == null ? 0 : preparacion.getStockRacionesRestantes()));
 		}
 
 		// 3. Actualizar Stock de la Preparación (dar de baja del stock las raciones entregadas)
@@ -138,23 +138,23 @@ public class EntregaAsistenciaServiceImpl implements EntregaAsistenciaService {
 
 	@Override
 	@Transactional // Es importante que este método sea transaccional
-    public void eliminarEntrega(Integer id) {
-        Optional<EntregaAsistencia> opt = entregaAsistenciaRepo.findById(id);
-        if (opt.isPresent()) {
-            EntregaAsistencia entrega = opt.get();
-            
-            // Revertir el stock de la Preparación
-            Preparacion preparacion = entrega.getPreparacion();
-            if (preparacion != null) {
-                // Sumar las raciones de vuelta al stock
-            	preparacion.setStockRacionesRestantes(Objects.requireNonNullElse(preparacion.getStockRacionesRestantes(), 0) + entrega.getCantidadRaciones());
-            	preparacionService.guardar(preparacion); // Guarda la preparación con el stock actualizado
-            }
-            
-            entrega.setActivo(false); // Eliminación lógica
-            entregaAsistenciaRepo.save(entrega);
-        } 
-    }
+	public void eliminarEntrega(Integer id) {
+		Optional<EntregaAsistencia> opt = entregaAsistenciaRepo.findById(id);
+		if (opt.isPresent()) {
+			EntregaAsistencia entrega = opt.get();
+			
+			// Revertir el stock de la Preparación
+			Preparacion preparacion = entrega.getPreparacion();
+			if (preparacion != null) {
+				// Sumar las raciones de vuelta al stock
+				preparacion.setStockRacionesRestantes(Objects.requireNonNullElse(preparacion.getStockRacionesRestantes(), 0) + entrega.getCantidadRaciones());
+				preparacionService.guardar(preparacion); // Guarda la preparación con el stock actualizado
+			}
+			
+			entrega.setActivo(false); // Eliminación lógica
+			entregaAsistenciaRepo.save(entrega);
+		} 
+	}
 
 
 

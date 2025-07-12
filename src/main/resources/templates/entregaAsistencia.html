@@ -91,10 +91,10 @@
             </thead>
             <tbody>
                 <tr th:each="entrega : ${entregas}">
-                    <td th:text="${entrega.nroFamilia}"></td>
-                    <td th:text="${entrega.nombreFamilia}"></td>
-                    <td th:text="${entrega.fechaEntrega}"></td>
-                    <td th:text="${entrega.nombrePlato}"></td>
+                    <td th:text="${entrega.familia.idFamilia}"></td>
+                    <td th:text="${entrega.familia.nombre}"></td>
+                    <td th:text="${entrega.fecha}"></td>
+                    <td th:text="${entrega.preparacion.receta.nombre}"></td>
                     <td th:text="${entrega.cantidadRaciones}"></td>
                 </tr>
             </tbody>

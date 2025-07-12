@@ -26,7 +26,10 @@ public class PreparacionServiceImpl implements PreparacionService {
 
     @Override
     public List<Preparacion> listarPreparacionesActivas() {
-        return preparacionRepo.findByActivaTrue();
+        // Solo mostrar preparaciones activas con stock de raciones restantes > 0
+        return preparacionRepo.findByActivaTrue().stream()
+            .filter(p -> p.getStockRacionesRestantes() != null && p.getStockRacionesRestantes() > 0)
+            .toList();
     }
     
     @Override
@@ -48,6 +51,8 @@ public class PreparacionServiceImpl implements PreparacionService {
     @Override
     public void crearPreparacion(Preparacion preparacion)  {
         validarPreparacion(preparacion);
+        // Inicializa el stock de raciones restantes al total preparado
+        preparacion.setStockRacionesRestantes(preparacion.getTotalRacionesPreparadas());
         stockService.descontarStock(preparacion);
         preparacionRepo.save(preparacion);
     }
