@@ -9,6 +9,7 @@ import desi.tp.entidades.Asistido;
 import desi.tp.entidades.Familia;
 import desi.tp.presentacion.asistido.AsistidoForm;
 import desi.tp.servicios.AsistidoService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -22,6 +23,7 @@ public class FamiliaForm {
 	private LocalDate fechaRegistro;
 
 	@Size(min = 1, message = "Debe agregar al menos un integrante.")
+	@Valid
 	private List<AsistidoForm> asistidos = new ArrayList<>();
 
 	public FamiliaForm() {

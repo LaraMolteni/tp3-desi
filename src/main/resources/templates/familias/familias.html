@@ -55,7 +55,7 @@
 					<tr th:each="familia : ${familias}">
 						<td th:text="${familia.nroFamilia}"></td>
 						<td th:text="${familia.nombreFamilia}"></td>
-						<td th:text="${familia.fechaAlta}"></td>
+						<td th:text="${#temporals.format(familia.fechaAlta, 'dd/MM/yyyy')}"></td>
 						<td
 							th:text="${familia.fechaUltimaAsistencia != null ? #temporals.format(familia.fechaUltimaAsistencia, 'dd/MM/yyyy') : 'Sin entregas'}">
 						</td>
@@ -68,7 +68,7 @@
 								onclick="return confirm('¿Estás seguro de que deseas eliminar esta familia?');">Eliminar</a>
 						</td>
 					</tr>
-					<tr th:if="${#lists.isEmpty(familias)}">
+					<tr th:if="${#lists.isEmpty(familias) and filtroAplicado}">
 						<td colspan="6">
 							<div class="notification is-warning has-text-centered">
 								No se encontraron resultados para los filtros aplicados.

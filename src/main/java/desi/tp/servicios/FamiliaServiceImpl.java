@@ -22,7 +22,7 @@ public class FamiliaServiceImpl implements FamiliaService {
 	private FamiliaRepo familiaRepo;
 
 	@Autowired
-	private AsistidoServiceImpl asistidoService;
+	private AsistidoService asistidoService;
 	
 	@Autowired
 	private EntregaAsistenciaRepo entregaAsistenciaRepo;
@@ -39,7 +39,7 @@ public class FamiliaServiceImpl implements FamiliaService {
 
 	@Override
 	@Transactional
-	public Familia modificarFamilia(Integer id, Familia datos) {
+	public Familia modificarFamilia(Integer id, Familia datos) throws Excepcion {
 
 		Familia familia = obtenerFamiliaSiExiste(id);
 

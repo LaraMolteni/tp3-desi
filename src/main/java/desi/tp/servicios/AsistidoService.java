@@ -7,8 +7,6 @@ import desi.tp.exepciones.Excepcion;
 
 public interface AsistidoService {
 
-	public void validarDnisFamilia(List<Asistido> asistidos) throws Excepcion;
-
 	public void validarDnisFamilia(List<Asistido> asistidos, Asistido nuevo) throws Excepcion;
 
 	public void validarDni(Asistido nuevo, List<Asistido> otrosIntegrantes) throws Excepcion;

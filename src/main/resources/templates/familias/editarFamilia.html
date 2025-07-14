@@ -13,7 +13,11 @@
 		<div class="container">
 			<h2 class="title is-3">Editar Familia</h2>
 
-			<div class="notification is-danger" th:if="${error}">
+			<div th:if="${mensaje}" class="notification is-success">
+				<p th:text="${mensaje}"></p>
+			</div>
+
+			<div th:if="${error}" class="notification is-danger">
 				<p th:text="${error}"></p>
 			</div>
 

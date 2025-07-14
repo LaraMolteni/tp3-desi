@@ -1,6 +1,7 @@
 package desi.tp.presentacion.familia;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +39,8 @@ public class FamiliaController {
 	@Autowired
 	AsistidoServiceImpl asistidoService;
 
-	// Crea un objeto familiaForm y lo guarda en el Model
+	// Crear un objeto familiaForm y guardarlo en el Model
+
 	@ModelAttribute("familiaForm")
 	public FamiliaForm familia() {
 		FamiliaForm familiaForm = new FamiliaForm();
@@ -53,7 +55,10 @@ public class FamiliaController {
 		List<FamiliaListadoDTO> familias = familiaService.listarFamilias().stream()
 				.map(f -> FamiliaListadoDTO.from(f, familiaService)).toList();
 
+		boolean filtroAplicado = false;
+
 		model.addAttribute("familias", familias);
+		model.addAttribute("filtroAplicado", filtroAplicado);
 		return "familias/familias";
 	}
 
@@ -125,113 +130,74 @@ public class FamiliaController {
 		return "familias/editarFamilia";
 	}
 
-	@PostMapping("/editarIntegrante/{index}")
-	public String editarIntegrante(@Valid @PathVariable int index,
-			@ModelAttribute("familiaForm") FamiliaForm familiaForm, BindingResult result,
-			RedirectAttributes redirectAttributes) {
-
-		AsistidoForm asistidoEditado = familiaForm.getAsistidos().get(index);
-
-		if (asistidoEditado.getFechaNacimiento() == null) {
-			result.rejectValue("asistidos[" + index + "].fechaNacimiento", "error.fechaNacimiento",
-					"La fecha de nacimiento no puede ser vacía");
-		}
-
-		if (result.hasErrors()) {
-			redirectAttributes.addFlashAttribute("error", "Error al guardar integrante.");
-			return "redirect:/familias/editarFamilia/" + familiaForm.getIdFamilia();
-		}
-
-		redirectAttributes.addFlashAttribute("mensaje", "Integrante editado con éxito.");
-		return "redirect:/familias/editarFamilia/" + familiaForm.getIdFamilia();
-	}
-
-	@PostMapping("/eliminarIntegrante/{index}")
-	public String eliminarIntegrante(@PathVariable int index, @ModelAttribute("familiaForm") FamiliaForm familiaForm,
-			RedirectAttributes redirectAttributes) {
-		if (index >= 0 && index < familiaForm.getAsistidos().size()) {
-			familiaForm.getAsistidos().get(index).setActivo(false);
-			redirectAttributes.addFlashAttribute("mensaje", "Integrante eliminado.");
-		}
-		return "redirect:/familias/editarFamilia/" + familiaForm.getIdFamilia();
-	}
-
+	// Guarda en la BD los cambios hechos en los integrantes (en memoria), y la
+	// familia completa.
 	@PostMapping("/{id}")
 	public String procesarFormulario(@PathVariable Integer id, @ModelAttribute("familiaForm") FamiliaForm form,
 			@RequestParam(required = false) String action, RedirectAttributes redirectAttributes,
 			SessionStatus status) {
 
-		// Cancelar edición
 		if ("cancelar".equals(action)) {
 			status.setComplete();
 			redirectAttributes.addFlashAttribute("mensaje", "Cambios cancelados.");
 			return "redirect:/familias";
 		}
 
-		// Guardar un integrante individual
-		if (action != null && action.startsWith("guardar-")) {
-			int index = Integer.parseInt(action.replace("guardar-", ""));
+		try {
+			Familia existente = familiaService.obtenerFamiliaSiExiste(id);
 
-			if (index >= 0 && index < form.getAsistidos().size()) {
-				AsistidoForm asistidoEditado = form.getAsistidos().get(index);
+			if (action != null) {
 
-				if (asistidoEditado.getFechaNacimiento() != null
-						&& asistidoEditado.getFechaNacimiento().isAfter(LocalDate.now())) {
-					redirectAttributes.addFlashAttribute("error", "La fecha de nacimiento no puede ser futura.");
+				// Guardar cambios de integrante individual
+				if (action.startsWith("guardar-")) {
+					int index = Integer.parseInt(action.replace("guardar-", ""));
+					if (validarIntegrante(form, index, redirectAttributes)) {
+						Familia actualizada = form.actualizarEntidad(existente, asistidoService);
+						familiaService.modificarFamilia(id, actualizada);
+						redirectAttributes.addFlashAttribute("mensaje", "Integrante guardado con éxito.");
+					}
 					return "redirect:/familias/editarFamilia/" + id;
 				}
 
-				try {
-					Familia existente = familiaService.obtenerFamiliaSiExiste(id);
-					Familia actualizada = form.actualizarEntidad(existente, asistidoService);
-					familiaService.modificarFamilia(id, actualizada);
-					redirectAttributes.addFlashAttribute("mensaje", "Integrante guardado con éxito.");
-				} catch (Excepcion e) {
-					redirectAttributes.addFlashAttribute("error", e.getMessage());
-				}
-			}
-			return "redirect:/familias/editarFamilia/" + id;
-		}
+				// Eliminar integrante
 
-		// Eliminar un integrante individual
-		if (action != null && action.startsWith("eliminar-")) {
-			int index = Integer.parseInt(action.replace("eliminar-", ""));
-			if (index >= 0 && index < form.getAsistidos().size()) {
-				form.getAsistidos().get(index).setActivo(false);
+				if (action.startsWith("eliminar-")) {
+					int index = Integer.parseInt(action.replace("eliminar-", ""));
+					form.getAsistidos().get(index).setActivo(false);
 
-				try {
-					Familia existente = familiaService.obtenerFamiliaSiExiste(id);
+					// Validar que la familia tenga al menos un integrante
+					if (form.getAsistidos().stream().noneMatch(AsistidoForm::isActivo)) {
+						form.getAsistidos().get(index).setActivo(true); // revertir
+						redirectAttributes.addFlashAttribute("error",
+								"La familia debe tener al menos un integrante activo.");
+						return "redirect:/familias/editarFamilia/" + id;
+					}
+
 					Familia actualizada = form.actualizarEntidad(existente, asistidoService);
 					familiaService.modificarFamilia(id, actualizada);
 					redirectAttributes.addFlashAttribute("mensaje", "Integrante eliminado.");
-				} catch (Excepcion e) {
-					redirectAttributes.addFlashAttribute("error", e.getMessage());
+					return "redirect:/familias/editarFamilia/" + id;
+				}
+
+				// Guardar los cambios de la familia completa
+				if ("guardar".equals(action)) {
+					Familia actualizada = form.actualizarEntidad(existente, asistidoService);
+					familiaService.modificarFamilia(id, actualizada);
+					status.setComplete();
+					redirectAttributes.addFlashAttribute("mensaje", "Familia actualizada con éxito.");
+					return "redirect:/familias";
 				}
 			}
+
+		} catch (Excepcion e) {
+			redirectAttributes.addFlashAttribute("error", e.getMessage());
 			return "redirect:/familias/editarFamilia/" + id;
 		}
 
-		// Guardar todos los cambios de la familia
-		if ("guardar".equals(action)) {
-			try {
-				Familia familiaExistente = familiaService.obtenerFamiliaSiExiste(id);
-				Familia actualizada = form.actualizarEntidad(familiaExistente, asistidoService);
-				familiaService.modificarFamilia(id, actualizada);
-				status.setComplete();
-				redirectAttributes.addFlashAttribute("mensaje", "Familia actualizada con éxito.");
-				return "redirect:/familias";
-			} catch (Excepcion e) {
-				redirectAttributes.addFlashAttribute("error", e.getMessage());
-				return "redirect:/familias/editarFamilia/" + id;
-			}
-
-		}
-
-		// Acción por defecto si no coincide nada
 		return "redirect:/familias";
 	}
 
-	// Buscar familia por id y nombre
+	// Filtrar familia por id y nombre
 
 	@GetMapping("/filtrar")
 	public String buscarFamilias(@RequestParam(required = false) Integer nroFamilia,
@@ -243,9 +209,12 @@ public class FamiliaController {
 						&& (nombre == null || f.getNombreFamilia().toLowerCase().contains(nombre.toLowerCase())))
 				.toList();
 
+		boolean filtroAplicado = (nroFamilia != null) || (nombre != null && !nombre.isBlank());
+
 		model.addAttribute("id", nroFamilia); //
 		model.addAttribute("nombre", nombre);
 		model.addAttribute("familias", resultados);
+		model.addAttribute("filtroAplicado", filtroAplicado);
 		return "familias/familias";
 	}
 
@@ -256,6 +225,35 @@ public class FamiliaController {
 		familiaService.eliminarFamilia(id);
 		redirect.addFlashAttribute("mensaje", "Familia eliminada correctamente.");
 		return "redirect:/familias";
+	}
+
+	// Validación manual para un integrante individual (al ser en memoria, no puedo
+	// utilizar los @Valid directamente)
+	private boolean validarIntegrante(FamiliaForm form, int index, RedirectAttributes redirectAttributes) {
+		if (index < 0 || index >= form.getAsistidos().size()) {
+			redirectAttributes.addFlashAttribute("error", "Índice de integrante inválido.");
+			return false;
+		}
+
+		AsistidoForm asistido = form.getAsistidos().get(index);
+		List<String> errores = new ArrayList<>();
+
+		if (asistido.getDni() == null)
+			errores.add("El DNI no puede estar vacío.");
+		if (asistido.getNombre() == null || asistido.getNombre().isBlank())
+			errores.add("El nombre no puede estar vacío.");
+		if (asistido.getApellido() == null || asistido.getApellido().isBlank())
+			errores.add("El apellido no puede estar vacío.");
+		if (asistido.getFechaNacimiento() != null && asistido.getFechaNacimiento().isAfter(LocalDate.now())) {
+			errores.add("La fecha de nacimiento no puede ser futura.");
+		}
+
+		if (!errores.isEmpty()) {
+			redirectAttributes.addFlashAttribute("error", String.join(" ", errores));
+			return false;
+		}
+
+		return true;
 	}
 
 }
