@@ -181,6 +181,10 @@ public class FamiliaController {
 
 				// Guardar los cambios de la familia completa
 				if ("guardar".equals(action)) {
+					if(form.getNombreFamilia().isBlank()) {
+						redirectAttributes.addFlashAttribute("error", "El nombre de la familia es obligatorio");
+						return "redirect:/familias/editarFamilia/" + id;
+					}
 					Familia actualizada = form.actualizarEntidad(existente, asistidoService);
 					familiaService.modificarFamilia(id, actualizada);
 					status.setComplete();
